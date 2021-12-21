@@ -3,9 +3,8 @@
 
 int	main()
 {
-	std::vector<std::string>	vTest;
+	std::vector<int>	vTest(5, 42);
 
-	std::cout << vTest.max_size() << std::endl;
-	std::cout << (((size_t) - 1) / sizeof(std::string)) / 2 << std::endl;
+	std::cout << vTest.capacity() << std::endl;
 	return (0);
 }
