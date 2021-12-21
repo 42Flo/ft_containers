@@ -29,10 +29,10 @@ namespace ft
 				: _size(0), _capacity(0), _alloc(alloc){}
 
 			// Copy constructor
-			vector(const ft::vector &x)
+			vector(const ft::vector<T, Alloc> &x)
 				: _size(x.size()), _capacity(x.capacity), _alloc(x.get_allocator)
 			{
-				//TODO find a way to deeply copy vector pointer
+				this->_vector = this->_alloc.allocate(this->_capacity);
 			}
 
 			// Fill constructor
@@ -49,6 +49,12 @@ namespace ft
 			template < class InputIterator >
 			vector(InputIterator first, InputIterator last
 					, const allocator_type &alloc = allocator_type())
+			{
+
+			}
+
+			// Assignation operator
+			ft::vector<T, Alloc>	operator=(const ft::vector<T, Alloc> &x)
 			{
 
 			}
@@ -109,15 +115,76 @@ namespace ft
 
 			}
 
-			//erase(): single element
+			// erase(): single element
 			iterator	erase(iterator position)
 			{
 
 			}
-			//erase(): in range
+			// erase(): in range
 			iterator	erase(iterator first, iterator last)
 			{
 
+			}
+
+			void	swap(ft::vector<T, Alloc>)
+			{
+
+			}
+
+			void	clear()
+			{
+				for (value_type i ; i < this->_size ; ++i)
+					this->_vector[i] = 0;
+				this->_size = 0;
+			}
+
+
+			// Element access
+
+			// operator []
+			reference	operator[](size_type n)
+			{ 
+				return (this->_vector[n]);
+			}
+			// const operator []
+			const_reference	operator[](size_type n) const
+			{
+				return (this->_vector[n]);
+			}
+
+			// at()
+			reference	at(size_type n)
+			{
+				//TODO throw out_of_range exception if n > size
+				return (this->_vector[n]);
+			}
+			// const at()
+			const_reference	at(size_type n) const
+			{
+				//TODO throw out_of_range exception if n > size
+				return (this->vector[n]);
+			}
+
+			// front()
+			reference	front()
+			{
+				return (this->_vector[0]);
+			}
+			// const front()
+			const_reference	front() const
+			{
+				return (this->_vector[0]);
+			}
+
+			// back()
+			reference	back()
+			{
+				return (this->_vector[this->_size - 1]);
+			}
+			// const back()
+			const_reference	back() const
+			{
+				return (this->_vector[this->_size - 1]);
 			}
 
 
