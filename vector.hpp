@@ -3,21 +3,155 @@
 
 # include <iostream>
 
+# include "iterator_traits.hpp"
+
 namespace ft
 {
 	template < class T, class Alloc = std::allocator<T> >
 	class vector
 	{
+		private:
+			class random_access_iterator
+			{
+				public:
+					typedef T	value_type;
+					typedef std::ptrdiff_t	difference_type;
+					typedef T&	reference;
+					typedef T*	pointer;
+
+					random_access_iterator(pointer val = 0) : _current(val){}
+					random_access_iterator(random_access_iterator const &src)
+						: _current(src.getCurrent()){}
+					~random_access_iterator(){}
+
+					pointer	getCurrent() const {return (this->_current);}
+
+					// ********** Operator overloads **********
+
+					// Assignation
+					random_access_iterator	operator=(random_access_iterator &r)
+					{
+						if (this != &r)
+							this->_current = r.getCurrent();
+						return (*this);
+					}
+
+					// Comparison
+					bool	operator==(random_access_iterator &r)
+					{
+						return (this->_current == r.getCurrent());
+					}
+					bool	operator!=(random_access_iterator &r)
+					{
+						return (this->_current != r.getCurrent());
+					}
+					bool	operator<(random_access_iterator &r)
+					{
+						return (this->_current < r.getCurrent());
+					}
+					bool	operator>(random_access_iterator &r)
+					{
+						return (this->_current > r.getCurrent());
+					}
+					bool	operator<=(random_access_iterator &r)
+					{
+						return (this->_current <= r.getCurrent());
+					}
+					bool	operator>=(random_access_iterator &r)
+					{
+						return (this->_current >= r.getCurrent());
+					}
+
+					// Referencing
+					reference	operator*(){ return (*(this->_current));}
+					pointer		operator->(){ return (this->_current);}
+					value_type	operator[](int r)
+					{
+						return (*(this->_current + r));
+					}
+
+					// Incrementations
+					random_access_iterator	operator++()
+					{
+						++(this->_current);
+						return (*this);
+					}
+					random_access_iterator	operator++(int)
+					{
+						random_access_iterator	tmp(*this);
+
+						++(this->_current);
+						return (tmp);
+					}
+					random_access_iterator	operator--()
+					{
+						--(this->_current);
+						return (*this);
+					}
+					random_access_iterator	operator--(int)
+					{
+						random_access_iterator	tmp(*this);
+
+						--(this->_current);
+						return (tmp);
+					}
+
+					// Arithmetic
+					random_access_iterator	operator+(int r) //TODO test a + n AND n + a
+					{
+						return (this->_current + r);
+					}
+					random_access_iterator	operator-(int r)
+					{
+						return (this->_current - r);
+					}
+					random_access_iterator	operator-(random_access_iterator &r)
+					{
+						//TODO substracting an iterator from another
+					}
+
+					// Compound assignment
+					random_access_iterator	operator+=(int r)
+					{
+						this->_current += r;
+						return (*this);
+					}
+					random_access_iterator	operator-=(int r)
+					{
+						this->_current -= r;
+						return (*this);
+					}
+
+				private:
+					pointer	_current;
+			};
+
+			template < class Iterator >
+			class reverse_iterator
+			{
+				public:
+					typedef Iterator	iterator_type;
+					typedef typename ft::iterator_traits<Iterator>::iterator_category	iterator_category;
+					typedef typename ft::iterator_traits<Iterator>::value_type	value_type;
+					typedef typename ft::iterator_traits<Iterator>::difference_type	difference_type;
+					typedef typename ft::iterator_traits<Iterator>::pointer	pointer;
+					typedef typename ft::iterator_traits<Iterator>::reference	reference;
+
+				
+				private:
+					iterator_type	_base;
+			};
+
 		public:
-
-			// Member types
-
 			typedef T	value_type;
 			typedef Alloc	allocator_type;
 			typedef typename allocator_type::reference	reference;
 			typedef typename allocator_type::const_reference	const_reference;
 			typedef typename allocator_type::pointer	pointer;
 			typedef typename allocator_type::const_pointer	const_pointer;
+			typedef random_access_iterator	iterator;
+			//TODO const iterator
+
 			typedef size_t	size_type;
 
 			//TODO iterator typedef and implementation
