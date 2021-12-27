@@ -3,14 +3,16 @@
 
 # include <iostream>
 
-# include "iterator_traits.hpp"
+# include "reverse_iterator.hpp"
 
 namespace ft
 {
-	template < class T, class Alloc = std::allocator<T> >
+    template < class T, class Alloc = std::allocator<T> >
 	class vector
 	{
 		private:
+			// ********** Random access iterator **********
+
 			class random_access_iterator
 			{
 				public:
@@ -36,42 +38,16 @@ namespace ft
 						return (*this);
 					}
 
-					// Comparison
-					bool	operator==(random_access_iterator &r)
-					{
-						return (this->_current == r.getCurrent());
-					}
-					bool	operator!=(random_access_iterator &r)
-					{
-						return (this->_current != r.getCurrent());
-					}
-					bool	operator<(random_access_iterator &r)
-					{
-						return (this->_current < r.getCurrent());
-					}
-					bool	operator>(random_access_iterator &r)
-					{
-						return (this->_current > r.getCurrent());
-					}
-					bool	operator<=(random_access_iterator &r)
-					{
-						return (this->_current <= r.getCurrent());
-					}
-					bool	operator>=(random_access_iterator &r)
-					{
-						return (this->_current >= r.getCurrent());
-					}
-
 					// Referencing
 					reference	operator*(){ return (*(this->_current));}
 					pointer		operator->(){ return (this->_current);}
-					value_type	operator[](int r)
+					reference	operator[](int r)
 					{
 						return (*(this->_current + r));
 					}
 
-					// Incrementations
-					random_access_iterator	operator++()
+					// Increment / Decrease
+					random_access_iterator	&operator++() //TODO try with ++(*this)
 					{
 						++(this->_current);
 						return (*this);
@@ -83,7 +59,7 @@ namespace ft
 						++(this->_current);
 						return (tmp);
 					}
-					random_access_iterator	operator--()
+					random_access_iterator	&operator--()
 					{
 						--(this->_current);
 						return (*this);
@@ -97,11 +73,11 @@ namespace ft
 					}
 
 					// Arithmetic
-					random_access_iterator	operator+(int r) //TODO test a + n AND n + a
+					random_access_iterator	operator+(int r) const //TODO test a + n AND n + a
 					{
 						return (this->_current + r);
 					}
-					random_access_iterator	operator-(int r)
+					random_access_iterator	operator-(int r) const
 					{
 						return (this->_current - r);
 					}
@@ -124,22 +100,40 @@ namespace ft
 
 				private:
 					pointer	_current;
-			};
 
-			template < class Iterator >
-			class reverse_iterator
-			{
-				public:
-					typedef Iterator	iterator_type;
-					typedef typename ft::iterator_traits<Iterator>::iterator_category	iterator_category;
-					typedef typename ft::iterator_traits<Iterator>::value_type	value_type;
-					typedef typename ft::iterator_traits<Iterator>::difference_type	difference_type;
-					typedef typename ft::iterator_traits<Iterator>::pointer	pointer;
-					typedef typename ft::iterator_traits<Iterator>::reference	reference;
+					// ********** Non-member opeator overloads **********
 
-				
-				private:
-					iterator_type	_base;
+					// Relational operators
+					friend bool	operator==(const random_access_iterator &l,
+							const random_access_iterator &r)
+					{
+						return (l.getCurrent() == r.getCurrent());
+					}
+					friend bool	operator!=(const random_access_iterator &l,
+							const random_access_iterator &r)
+					{
+						return (l.getCurrent() != r.getCurrent());
+					}
+					friend bool	operator<(const random_access_iterator &l,
+							const random_access_iterator &r)
+					{
+						return (l.getCurrent() < r.getCurrent());
+					}
+					friend bool	operator<=(const random_access_iterator &l,
+							const random_access_iterator &r)
+					{
+						return (l.getCurrent() <= r.getCurrent());
+					}
+					friend bool	operator>(const random_access_iterator &l,
+							const random_access_iterator &r)
+					{
+						return (l.getCurrent() > r.getCurrent());
+					}
+					friend bool	operator>=(const random_access_iterator &l,
+							const random_access_iterator &r)
+					{
+						return (l.getCurrent() >= r.getCurrent());
+					}
 			};
 
 		public:
@@ -150,7 +144,8 @@ namespace ft
 			typedef typename allocator_type::pointer	pointer;
 			typedef typename allocator_type::const_pointer	const_pointer;
 			typedef random_access_iterator	iterator;
-			//TODO const iterator
+            typedef ft::reverse_iterator<iterator>    reverse_iterator;
+            //TODO const iterators
 
 			typedef size_t	size_type;
 
@@ -184,7 +179,7 @@ namespace ft
 			vector(InputIterator first, InputIterator last
 					, const allocator_type &alloc = allocator_type())
 			{
-
+                
 			}
 
 			// Assignation operator
@@ -233,7 +228,7 @@ namespace ft
 			}
 
 			// insert(): single element
-			iterator	insert(iterator position, const_value &val)
+			iterator	insert(iterator position, const value_type &val)
 			{
 
 			}
