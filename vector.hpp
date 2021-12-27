@@ -185,25 +185,48 @@ namespace ft
 			// Assignation operator
 			ft::vector<T, Alloc>	operator=(const ft::vector<T, Alloc> &x)
 			{
-
+                if (&x != this)
+                {
+                    this->_size = x.size();
+                    this->_capacity = x.capacity();
+                    this->_alloc = x.get_allocator();
+                    this->_vector = this->_alloc.allocate(this->_capacity);
+                    for (unsigned int i ; i < this->_size ; ++i)
+                        this->_vector[i] = x[i];
+                }
 			}
 		
+            // Iterators
+            iterator    begin()
+            { 
+                return (iterator(&(this->_vector[0])));
+            }
+            //TODO const begin
+            reverse_iterator    rbegin()
+            {
+                return (reverse_iterator(&(this->_vector[this->_size])));
+            }
+            iterator    last()
+            { 
+                return (iterator(&(this->_vector[this->_size])));
+            }
+            //TODO const last
+            reverse_iterator    rlast()
+            {
+                return (reverse_iterator(&(this->_vectr[0])));
+            }
 
 			// Capacity / size
-
 			size_type	size() const { return (this->_size);}
-			
 			size_type	max_size() const 
 			{
 				//return ((((size_type) - 1) / sizeof(T)) / 2);
 				return (this->_alloc.max_size());
 			}
-			
 			void	resize(size_type n , value_type val = value_type())
 			{
-
+                
 			}
-
 			size_type	capacity() const { return (this->_capacity);}
 			
 			//TODO empty()
@@ -212,7 +235,6 @@ namespace ft
 
 
 			// Modifiers
-
 			void	push_back(const value_type &val)
 			{
 				if (this->_size < this->_capacity)
@@ -220,10 +242,9 @@ namespace ft
 				//TODO else realloc : find the best way to realloc
 				this->_size++;
 			}
-
 			void	pop_back()
 			{
-				this->_vector[this->size] = 0;
+				this->_vector[this->_size] = 0;
 				this->_size--;
 			}
 
