@@ -167,7 +167,7 @@ namespace ft
 			// Fill constructor
 			explicit vector(size_type n, const value_type &val = value_type()
 					, const allocator_type &alloc = allocator_type())
-				: _size(n), _capacity(n)
+				: _size(n), _capacity(n), _alloc(alloc)
 			{
 				this->_vector = this->_alloc.allocate(this->_capacity);
 				for (unsigned int i = 0 ; i < this->_capacity ; ++i)
@@ -175,12 +175,12 @@ namespace ft
 			}
 
 			// Range constructor
-			template < class InputIterator >
+			/*template < class InputIterator >
 			vector(InputIterator first, InputIterator last
 					, const allocator_type &alloc = allocator_type())
 			{
                 
-			}
+			}*/
 
 			// Assignation operator
 			ft::vector<T, Alloc>	operator=(const ft::vector<T, Alloc> &x)
@@ -206,12 +206,12 @@ namespace ft
             {
                 return (reverse_iterator(&(this->_vector[this->_size])));
             }
-            iterator    last()
+            iterator    end()
             { 
                 return (iterator(&(this->_vector[this->_size])));
             }
             //TODO const last
-            reverse_iterator    rlast()
+            reverse_iterator    rend()
             {
                 return (reverse_iterator(&(this->_vectr[0])));
             }
@@ -238,8 +238,12 @@ namespace ft
 			void	push_back(const value_type &val)
 			{
 				if (this->_size < this->_capacity)
-					this->_vector[this->size] = val;
-				//TODO else realloc : find the best way to realloc
+					this->_vector[this->_size - 1] = val;
+                else
+                {
+                    reallocVector();
+                    this->_vector[this->_size] = val;
+                }
 				this->_size++;
 			}
 			void	pop_back()
@@ -312,7 +316,7 @@ namespace ft
 			const_reference	at(size_type n) const
 			{
 				//TODO throw out_of_range exception if n > size
-				return (this->vector[n]);
+				return (this->_vector[n]);
 			}
 
 			// front()
@@ -341,10 +345,25 @@ namespace ft
 			allocator_type	get_allocator() const {return (this->_alloc);}
 
 		private:
+
+            void    reallocVector()
+            {
+                pointer newVector = this->_alloc.allocate(this->_size + 1);
+
+                for (unsigned int i = 0 ; i < this->_size ; ++i)
+                {
+                    this->_alloc.construct(&newVector[i], this->_vector[i]);
+                    this->_alloc.destroy(&this->_vector[i]);
+                }
+                this->_alloc.deallocate(this->_vector, this->_capacity);
+                this->_vector = newVector;
+                ++this->_capacity;
+            }
+
 			value_type	*_vector;
 			size_type	_size;
 			size_type	_capacity;
-			allocator_type const	&_alloc;
+			allocator_type  _alloc;
 	};
 }
 
