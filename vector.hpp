@@ -171,7 +171,7 @@ namespace ft
 			{
 				this->_vector = this->_alloc.allocate(this->_capacity);
 				for (unsigned int i = 0 ; i < this->_capacity ; ++i)
-					this->_vector[i] = val; //This may not work
+					this->_alloc.construct(&(this->_vector[i]), val);
 			}
 
 			// Range constructor
