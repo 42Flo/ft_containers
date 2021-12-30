@@ -6,7 +6,7 @@
 
 # include "vector.hpp"
 
-int	main()//TODO fix push_back!
+int	main()
 {
     {
         ft::vector<int>  v(5, 42);
