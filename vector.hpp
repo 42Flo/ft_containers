@@ -237,30 +237,45 @@ namespace ft
 			// Modifiers
 			void	push_back(const value_type &val)
 			{
-				if (this->_size < this->_capacity)
-					this->_vector[this->_size - 1] = val;
-                else
-                {
-                    reallocVector();
-                    this->_vector[this->_size] = val;
-                }
-				this->_size++;
+				if (this->_size >= this->_capacity)
+                    reallocVector(1, true);
+                this->_alloc.construct(&(this->_vector[this->_size]), val);
+                ++this->_size;
 			}
 			void	pop_back()
 			{
-				this->_vector[this->_size] = 0;
-				this->_size--;
+                this->_alloc.destroy(this->_vector[this->_size - 1]);
+                --this->_size;
 			}
 
 			// insert(): single element
 			iterator	insert(iterator position, const value_type &val)
-			{
-
-			}
+            {
+            }
 			// insert(): fill
 			void	insert(iterator position, size_type n, const value_type &val)
 			{
+                if (position == this->end())
+                {
+                    reallocVector(n, true);
+                    for (unsigned int i = this->_size ; i < n ; ++i)
+                        this->_alloc.construct(this->_vector[i], val);
+                }
+                else
+                {
+                    vector<T>   tmp(*this);
+                    unsigned int    i = 0;
 
+                    reallocVector(n, false);
+                    for (iterator it = this->begin() ; it != position ; ++it)
+                        this->_alloc.construct(*it, tmp[i++]);
+                    for (unsigned int i = 0 ; i < n ; ++i)
+                        this->_alloc.construct(*position++, val);
+                    i += n;
+                    for (position ; position != this->end() ; ++position)
+                        this->_alloc.construct(*position, tmp[i++]);
+                }
+                this->_size += n;
 			}
 			// insert(): fill in range
 			template < class InputIterator >
@@ -346,25 +361,41 @@ namespace ft
 
 		private:
 
-            void    reallocVector()
+            /*void    reallocVector()
             {
-                pointer newVector = this->_alloc.allocate(this->_size + 1);
+                pointer newVector = this->_alloc.allocate(++this->capacity);
 
                 for (unsigned int i = 0 ; i < this->_size ; ++i)
                 {
                     this->_alloc.construct(&newVector[i], this->_vector[i]);
-                    this->_alloc.destroy(&this->_vector[i]);
+                    this->_alloc.destroy(&(this->_vector[i]));
                 }
                 this->_alloc.deallocate(this->_vector, this->_capacity);
                 this->_vector = newVector;
-                ++this->_capacity;
+            }*/
+
+            void    reallocVector(size_type n, bool copy)
+            {
+                pointer  newVector = this->_alloc.allocate(this->_capacity += n);
+
+                if (copy == true)
+                {
+                    for (unsigned int i = 0 ; i < this->_size ; ++i)
+                    {
+                        this->_alloc.construct(&newVector[i], this->_vector[i]);
+                        this->_alloc.destroy(&(this->_vector[i]));
+                    }
+                }
+                //this->_alloc.deallocate(this->_vector, this->_capacity - n);
+                //TODO fix free
+                this->_vector = newVector;
             }
 
-			value_type	*_vector;
-			size_type	_size;
-			size_type	_capacity;
-			allocator_type  _alloc;
-	};
+            pointer _vector;
+            size_type	_size;
+            size_type	_capacity;
+            allocator_type  _alloc;
+    };
 }
 
 #endif // VECTOR_HPP
