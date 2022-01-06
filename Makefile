@@ -1,6 +1,6 @@
 NAME			=	ft_containers
 CC				=	c++
-FLAGS			=	-Wall -Wextra -Werror -std=c++98
+FLAGS			=	-Wall -Wextra -std=c++98
 
 PATH_SRCS		=	./
 SRCS			=	main.cpp

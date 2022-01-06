@@ -171,7 +171,7 @@ namespace ft
 			{
 				this->_vector = this->_alloc.allocate(this->_capacity);
 				for (unsigned int i = 0 ; i < this->_capacity ; ++i)
-					this->_vector[i] = val; //This may not work
+					this->_alloc.construct(&(this->_vector[i]), val);
 			}
 
 			// Range constructor
@@ -179,7 +179,8 @@ namespace ft
 			vector(InputIterator first, InputIterator last
 					, const allocator_type &alloc = allocator_type())
 			{
-                
+                //TODO enable_if to force this constructor to be called when
+                // passing iterators
 			}*/
 
 			// Assignation operator
@@ -192,7 +193,7 @@ namespace ft
                     this->_alloc = x.get_allocator();
                     this->_vector = this->_alloc.allocate(this->_capacity);
                     for (unsigned int i ; i < this->_size ; ++i)
-                        this->_vector[i] = x[i];
+                        this->_alloc.construct(&(this->_vector[i]), x[i]);
                 }
 			}
 		
@@ -223,14 +224,27 @@ namespace ft
 				//return ((((size_type) - 1) / sizeof(T)) / 2);
 				return (this->_alloc.max_size());
 			}
-			void	resize(size_type n , value_type val = value_type())
+			void	resize(size_type n, value_type val = value_type())
 			{
-                
+                if (n < this->_size)
+                    for (unsigned int i = n ; i < this->_size ; i++)
+                        this->_alloc.destroy(this->_vector[i]);
+                else
+                {
+                    unsigned int    i = this->_size;
+                    //TODO realloc if n > capacity
+                    this->_size = n;
+                    for ( ; i < this->_size ; ++i)
+                        this->_alloc.construct(&(this->_vector[i]), val);
+                }
 			}
 			size_type	capacity() const { return (this->_capacity);}
 			
-			//TODO empty()
-			
+			bool    empty() const
+            {
+                return ((this->_size == 0) ? true : false);
+            }
+
 			//TODO reserve()
 
 
@@ -360,7 +374,7 @@ namespace ft
 			allocator_type	get_allocator() const {return (this->_alloc);}
 
 		private:
-
+            //TODO think about the best way to do that
             /*void    reallocVector()
             {
                 pointer newVector = this->_alloc.allocate(++this->capacity);
@@ -372,6 +386,7 @@ namespace ft
                 }
                 this->_alloc.deallocate(this->_vector, this->_capacity);
                 this->_vector = newVector;
+<<<<<<< HEAD
             }*/
 
             void    reallocVector(size_type n, bool copy)
