@@ -107,13 +107,13 @@ void    lstAddBack(t_list **ptr, t_list *new)
     }
 }
 
-int getType(char *args)
+int getType(char *arg)
 {
-    if (!args)
+    if (!arg)
         return (END);
-    if (strcmp(args, "|") == 0)
+    if (strcmp(arg, "|") == 0)
         return (PIPE);
-    if (strcmp(args, ";") == 0)
+    if (strcmp(arg, ";") == 0)
         return (SEMI);
     return (-1);
 }

@@ -265,6 +265,8 @@ namespace ft
 			// insert(): single element
 			iterator	insert(iterator position, const value_type &val)
             {
+                this->insert(position, 1, val);
+                return (position);
             }
 			// insert(): fill
 			void	insert(iterator position, size_type n, const value_type &val)
@@ -278,16 +280,16 @@ namespace ft
                 else
                 {
                     vector<T>   tmp(*this);
-                    unsigned int    i = 0;
+                    unsigned int    j = 0;
 
                     reallocVector(n, false);
                     for (iterator it = this->begin() ; it != position ; ++it)
-                        this->_alloc.construct(*it, tmp[i++]);
+                        this->_alloc.construct(*it, tmp[j++]);
                     for (unsigned int i = 0 ; i < n ; ++i)
                         this->_alloc.construct(*position++, val);
-                    i += n;
+                    j += n;
                     for (position ; position != this->end() ; ++position)
-                        this->_alloc.construct(*position, tmp[i++]);
+                        this->_alloc.construct(*position, tmp[j++]);
                 }
                 this->_size += n;
 			}
@@ -374,20 +376,6 @@ namespace ft
 			allocator_type	get_allocator() const {return (this->_alloc);}
 
 		private:
-            //TODO think about the best way to do that
-            /*void    reallocVector()
-            {
-                pointer newVector = this->_alloc.allocate(++this->capacity);
-
-                for (unsigned int i = 0 ; i < this->_size ; ++i)
-                {
-                    this->_alloc.construct(&newVector[i], this->_vector[i]);
-                    this->_alloc.destroy(&(this->_vector[i]));
-                }
-                this->_alloc.deallocate(this->_vector, this->_capacity);
-                this->_vector = newVector;
-<<<<<<< HEAD
-            }*/
 
             void    reallocVector(size_type n, bool copy)
             {
@@ -401,8 +389,7 @@ namespace ft
                         this->_alloc.destroy(&(this->_vector[i]));
                     }
                 }
-                //this->_alloc.deallocate(this->_vector, this->_capacity - n);
-                //TODO fix free
+                this->_alloc.deallocate(this->_vector, this->_capacity - n);
                 this->_vector = newVector;
             }
 
