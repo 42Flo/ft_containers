@@ -159,7 +159,7 @@ namespace ft
 
 			// Copy constructor
 			vector(const ft::vector<T, Alloc> &x)
-				: _size(x.size()), _capacity(x.capacity), _alloc(x.get_allocator)
+				: _size(x.size()), _capacity(x.capacity()), _alloc(x.get_allocator())
 			{
 				this->_vector = this->_alloc.allocate(this->_capacity);
 			}
@@ -271,34 +271,26 @@ namespace ft
 			// insert(): fill
 			void	insert(iterator position, size_type n, const value_type &val)
 			{
+                std::cout << "insert fill!" << std::endl;
                 if (position == this->end())
                 {
                     reallocVector(n, true);
-                    for (unsigned int i = this->_size ; i < n ; ++i)
-                        this->_alloc.construct(this->_vector[i], val);
+                    for (unsigned int i = this->_size ; i <= n ; ++i)
+                        this->_alloc.construct(&(this->_vector[i]), val);
+                    this->_size += n;
                 }
                 else
                 {
-                    vector<T>   tmp(*this);
-                    unsigned int    j = 0;
-
                     reallocVector(n, false);
-                    for (iterator it = this->begin() ; it != position ; ++it)
-                        this->_alloc.construct(*it, tmp[j++]);
-                    for (unsigned int i = 0 ; i < n ; ++i)
-                        this->_alloc.construct(*position++, val);
-                    j += n;
-                    for (position ; position != this->end() ; ++position)
-                        this->_alloc.construct(*position, tmp[j++]);
+                    //TODO insert in the middle of vector
                 }
-                this->_size += n;
 			}
 			// insert(): fill in range
-			template < class InputIterator >
+			/*template < class InputIterator >
 			void	insert(iterator position, InputIterator first, InputIterator last)
 			{
-
-			}
+                std::cout << "insert in range!" << std::endl;
+			}*/
 
 			// erase(): single element
 			iterator	erase(iterator position)
