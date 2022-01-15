@@ -159,7 +159,7 @@ namespace ft
 
 			// Copy constructor
 			vector(const ft::vector<T, Alloc> &x)
-				: _size(x.size()), _capacity(x.capacity), _alloc(x.get_allocator)
+				: _size(x.size()), _capacity(x.capacity()), _alloc(x.get_allocator())
 			{
 				this->_vector = this->_alloc.allocate(this->_capacity);
 			}
@@ -265,38 +265,32 @@ namespace ft
 			// insert(): single element
 			iterator	insert(iterator position, const value_type &val)
             {
+                this->insert(position, 1, val);
+                return (position);
             }
 			// insert(): fill
 			void	insert(iterator position, size_type n, const value_type &val)
 			{
+                std::cout << "insert fill!" << std::endl;
                 if (position == this->end())
                 {
                     reallocVector(n, true);
-                    for (unsigned int i = this->_size ; i < n ; ++i)
-                        this->_alloc.construct(this->_vector[i], val);
+                    for (unsigned int i = this->_size ; i <= n ; ++i)
+                        this->_alloc.construct(&(this->_vector[i]), val);
+                    this->_size += n;
                 }
                 else
                 {
-                    vector<T>   tmp(*this);
-                    unsigned int    i = 0;
-
                     reallocVector(n, false);
-                    for (iterator it = this->begin() ; it != position ; ++it)
-                        this->_alloc.construct(*it, tmp[i++]);
-                    for (unsigned int i = 0 ; i < n ; ++i)
-                        this->_alloc.construct(*position++, val);
-                    i += n;
-                    for (position ; position != this->end() ; ++position)
-                        this->_alloc.construct(*position, tmp[i++]);
+                    //TODO insert in the middle of vector
                 }
-                this->_size += n;
 			}
 			// insert(): fill in range
-			template < class InputIterator >
+			/*template < class InputIterator >
 			void	insert(iterator position, InputIterator first, InputIterator last)
 			{
-
-			}
+                std::cout << "insert in range!" << std::endl;
+			}*/
 
 			// erase(): single element
 			iterator	erase(iterator position)
@@ -374,20 +368,6 @@ namespace ft
 			allocator_type	get_allocator() const {return (this->_alloc);}
 
 		private:
-            //TODO think about the best way to do that
-            /*void    reallocVector()
-            {
-                pointer newVector = this->_alloc.allocate(++this->capacity);
-
-                for (unsigned int i = 0 ; i < this->_size ; ++i)
-                {
-                    this->_alloc.construct(&newVector[i], this->_vector[i]);
-                    this->_alloc.destroy(&(this->_vector[i]));
-                }
-                this->_alloc.deallocate(this->_vector, this->_capacity);
-                this->_vector = newVector;
-<<<<<<< HEAD
-            }*/
 
             void    reallocVector(size_type n, bool copy)
             {
@@ -401,8 +381,7 @@ namespace ft
                         this->_alloc.destroy(&(this->_vector[i]));
                     }
                 }
-                //this->_alloc.deallocate(this->_vector, this->_capacity - n);
-                //TODO fix free
+                this->_alloc.deallocate(this->_vector, this->_capacity - n);
                 this->_vector = newVector;
             }
 
