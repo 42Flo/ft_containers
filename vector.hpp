@@ -281,7 +281,7 @@ namespace ft
                 }
                 else
                 {
-                    reallocVector(n, false);
+                    reallocVector(position, true);
                     //TODO insert in the middle of vector
                 }
 			}
@@ -364,7 +364,6 @@ namespace ft
 				return (this->_vector[this->_size - 1]);
 			}
 
-
 			allocator_type	get_allocator() const {return (this->_alloc);}
 
 		private:
@@ -383,6 +382,16 @@ namespace ft
                 }
                 this->_alloc.deallocate(this->_vector, this->_capacity - n);
                 this->_vector = newVector;
+            }
+
+            void    reallocVector(iterator position, bool copy)
+            {
+                int newCapacity = 0;
+
+                std::cout << "reallocVector iterator called!" << std::endl;
+                for (iterator it = this->begin() ; it != this->end() ; ++it)
+                    ++newCapacity;
+                reallocVector(newCapacity, copy);
             }
 
             pointer _vector;

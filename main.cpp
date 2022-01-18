@@ -110,7 +110,10 @@ int	main()
 
         std::cout << "insert fill from end()" << std::endl;
         v.push_back(1);
-        v.insert(v.end(), 5, 42);
+        v.push_back(1);
+        v.push_back(1);
+        v.push_back(1);
+        v.insert(v.begin() + 2, 5, 42);
 
         std::cout << "size: " << v.size() << std::endl
             << "capacity: " << v.capacity() << std::endl
@@ -137,7 +140,10 @@ int	main()
 
         std::cout << "insert fill from end()" << std::endl;
         v.push_back(1);
-        v.insert(v.end(), 5, 42);
+        v.push_back(1);
+        v.push_back(1);
+        v.push_back(1);
+        v.insert(v.begin() + 2, 5, 42);
 
         std::cout << "size: " << v.size() << std::endl
             << "capacity: " << v.capacity() << std::endl
