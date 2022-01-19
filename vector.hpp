@@ -1,4 +1,4 @@
-#ifndef VECTOR_HPP
+hifndef VECTOR_HPP
 # define VECTOR_HPP
 
 # include <iostream>
@@ -227,16 +227,16 @@ namespace ft
 			void	resize(size_type n, value_type val = value_type())
 			{
                 if (n < this->_size)
-                    for (unsigned int i = n ; i < this->_size ; i++)
+                    for (unsigned int i = n ; i < this->_size ; ++i)
                         this->_alloc.destroy(this->_vector[i]);
                 else
                 {
-                    unsigned int    i = this->_size;
-                    //TODO realloc if n > capacity
-                    this->_size = n;
-                    for ( ; i < this->_size ; ++i)
+                    if (this->_capacity < n)
+                        reallocVector(n, true);
+                    for (unsigned int i = this->_size ; i < n ; ++i)
                         this->_alloc.construct(&(this->_vector[i]), val);
                 }
+                this->_size = n;
 			}
 			size_type	capacity() const { return (this->_capacity);}
 			
@@ -245,8 +245,11 @@ namespace ft
                 return ((this->_size == 0) ? true : false);
             }
 
-			//TODO reserve()
-
+            void    reserve(size_type n)
+            {
+                if (this->_capacity < n)
+                    reallocVector(n, true);
+            }
 
 			// Modifiers
 			void	push_back(const value_type &val)
@@ -258,7 +261,7 @@ namespace ft
 			}
 			void	pop_back()
 			{
-                this->_alloc.destroy(this->_vector[this->_size - 1]);
+                this->_alloc.destroy(&(this->_vector[this->_size - 1]));
                 --this->_size;
 			}
 
@@ -295,7 +298,12 @@ namespace ft
 			// erase(): single element
 			iterator	erase(iterator position)
 			{
-
+                if (position == this->end())
+                    this->_alloc.destroy(&(this->_vector[this->size - 1]));
+                else
+                {
+                    //TODO relocate vector
+                }
 			}
 			// erase(): in range
 			iterator	erase(iterator first, iterator last)
@@ -382,16 +390,6 @@ namespace ft
                 }
                 this->_alloc.deallocate(this->_vector, this->_capacity - n);
                 this->_vector = newVector;
-            }
-
-            void    reallocVector(iterator position, bool copy)
-            {
-                int newCapacity = 0;
-
-                std::cout << "reallocVector iterator called!" << std::endl;
-                for (iterator it = this->begin() ; it != this->end() ; ++it)
-                    ++newCapacity;
-                reallocVector(newCapacity, copy);
             }
 
             pointer _vector;
