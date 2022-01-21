@@ -1,4 +1,4 @@
-hifndef VECTOR_HPP
+#ifndef VECTOR_HPP
 # define VECTOR_HPP
 
 # include <iostream>
@@ -221,7 +221,6 @@ namespace ft
 			size_type	size() const { return (this->_size);}
 			size_type	max_size() const 
 			{
-				//return ((((size_type) - 1) / sizeof(T)) / 2);
 				return (this->_alloc.max_size());
 			}
 			void	resize(size_type n, value_type val = value_type())
@@ -277,14 +276,14 @@ namespace ft
                 std::cout << "insert fill!" << std::endl;
                 if (position == this->end())
                 {
-                    reallocVector(n, true);
+                    if (this->_size + n > this->_capacity)
+                        reallocVector(n, true);
                     for (unsigned int i = this->_size ; i <= n ; ++i)
                         this->_alloc.construct(&(this->_vector[i]), val);
                     this->_size += n;
                 }
                 else
                 {
-                    reallocVector(position, true);
                     //TODO insert in the middle of vector
                 }
 			}
@@ -308,7 +307,7 @@ namespace ft
 			// erase(): in range
 			iterator	erase(iterator first, iterator last)
 			{
-
+                
 			}
 
 			void	swap(ft::vector<T, Alloc>)
