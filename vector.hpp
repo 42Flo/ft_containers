@@ -2,8 +2,10 @@
 # define VECTOR_HPP
 
 # include <iostream>
+# include <stdexcept>
 
 # include "reverse_iterator.hpp"
+# include "type_traits.hpp"
 
 namespace ft
 {
@@ -175,13 +177,19 @@ namespace ft
 			}
 
 			// Range constructor
-			/*template < class InputIterator >
-			vector(InputIterator first, InputIterator last
-					, const allocator_type &alloc = allocator_type())
+			template < class InputIterator >
+			vector(InputIterator first, InputIterator last,
+                    const allocator_type &alloc = allocator_type(),
+                    typename ft::enable_if<!ft::is_integral<InputIterator>::value,
+                    InputIterator>::type = 0)
 			{
-                //TODO enable_if to force this constructor to be called when
-                // passing iterators
-			}*/
+                for (InputIterator tmp = first ; tmp != last ; ++tmp)
+                    ++this->_capacity;
+                this->_vector = this->_alloc.allocate(this->_capacity);
+                for ( ; first != last ; ++first)
+                    this->push_back(*first);
+			}
+            //TODO tests for range constructor
 
 			// Assignation operator
 			ft::vector<T, Alloc>	operator=(const ft::vector<T, Alloc> &x)
@@ -288,11 +296,13 @@ namespace ft
                 }
 			}
 			// insert(): fill in range
-			/*template < class InputIterator >
-			void	insert(iterator position, InputIterator first, InputIterator last)
+			template < class InputIterator >
+			void	insert(iterator position, InputIterator first, InputIterator last,
+                    typename ft::enable_if<!ft::is_integral<InputIterator>::value,
+                    InputIterator>::type = 0)
 			{
                 std::cout << "insert in range!" << std::endl;
-			}*/
+			}
 
 			// erase(): single element
 			iterator	erase(iterator position)
@@ -310,18 +320,26 @@ namespace ft
                 
 			}
 
-			void	swap(ft::vector<T, Alloc>)
+			void	swap(ft::vector<T, Alloc> &x)
 			{
+                ft::vector<T, Alloc>  tmp(*this);
 
+                this->clear();
+                if (this->_capacity < x.size())
+                    this->reallocVector(x.capacity() - this->_capacity, false);
+                for (unsigned int i ; i < x.size() ; ++i)
+                    this->push_back(x[i]);
+                x.clear();
+                for (unsigned int i ; i < tmp.size() ; ++i)
+                    x.push_back(tmp[i]);
 			}
 
 			void	clear()
 			{
 				for (value_type i ; i < this->_size ; ++i)
-					this->_vector[i] = 0;
+                    this->_alloc.destroy(&(this->_vector[i]));
 				this->_size = 0;
 			}
-
 
 			// Element access
 
@@ -339,13 +357,15 @@ namespace ft
 			// at()
 			reference	at(size_type n)
 			{
-				//TODO throw out_of_range exception if n > size
+                if (n < this->_size)
+                    throw (std::out_of_range("Error: out of range"));
 				return (this->_vector[n]);
 			}
 			// const at()
 			const_reference	at(size_type n) const
 			{
-				//TODO throw out_of_range exception if n > size
+                if (n < this->_size)
+                    throw (std::out_of_range("Error: out of range"));
 				return (this->_vector[n]);
 			}
 
