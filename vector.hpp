@@ -81,9 +81,13 @@ namespace ft
 					{
 						return (this->_current - r);
 					}
-					random_access_iterator	operator-(random_access_iterator &r)
+					unsigned int operator-(random_access_iterator &r)
 					{
-						//TODO substracting an iterator from another
+                        unsigned int    ret;
+
+                        for (pointer tmp = this->_current ; tmp != r ; ++tmp)
+                            ++ret;
+                        return (ret);
 					}
 
 					// Compound assignment
@@ -245,8 +249,11 @@ namespace ft
                 return ((this->_size == 0) ? true : false);
             }
 
-			//TODO reserve()
-
+			void    reserve(size_type n)
+            {
+                if (n < this->_capacity)
+                    reallocVector(n, true);
+            }
 
 			// Modifiers
 			void	push_back(const value_type &val)
@@ -280,9 +287,27 @@ namespace ft
                     this->_size += n;
                 }
                 else
-                {
-                    reallocVector(n, false);
-                    //TODO insert in the middle of vector
+                {//TODO fix this
+                    ft::vector<T, Alloc>  newVector;
+                    iterator    newIt = newVector.begin();
+
+                    newVector._alloc.allocate(this->_capacity + n, &newVector);
+                    newVector._capacity = this->_capacity + n;
+                    for (iterator it = this->begin() ; it != position ; ++it)
+                    {
+                        newVector._alloc.construt(newIt++, *it);
+                        this->_alloc.destroy(it);
+                    }
+                    for (unsigned int i = 0 ; i < n ; ++i)
+                        newVector._alloc.construct(newIt++, val);
+                    for ( ; position != this->end() ; ++position)
+                    {
+                        newVector._alloc.construct(newIt++, *position);
+                        this->_alloc.destroy(position);
+                    }
+                    newVector._size = this->_size + n;
+                    this->_alloc.deallocate(this->_vector);
+                    this->_vector = newVector;
                 }
 			}
 			// insert(): fill in range
@@ -371,18 +396,29 @@ namespace ft
 
             void    reallocVector(size_type n, bool copy)
             {
-                pointer  newVector = this->_alloc.allocate(this->_capacity += n);
+                pointer  newVec = this->_alloc.allocate(this->_capacity += n);
 
                 if (copy == true)
                 {
                     for (unsigned int i = 0 ; i < this->_size ; ++i)
                     {
-                        this->_alloc.construct(&newVector[i], this->_vector[i]);
+                        this->_alloc.construct(&newVec[i], this->_vector[i]);
                         this->_alloc.destroy(&(this->_vector[i]));
                     }
                 }
                 this->_alloc.deallocate(this->_vector, this->_capacity - n);
-                this->_vector = newVector;
+                this->_vector = newVec;
+            }
+
+            void    _shrinkVector(iterator position)
+            {
+                for (iterator it = position ; it != this->end() ; ++it)
+                {
+                    this->_alloc.destroy(it);
+                    --this->_size;
+                    --this->_capacity;
+                }
+                this->_alloc.deallocate(position, this->end() - position);
             }
 
             pointer _vector;
