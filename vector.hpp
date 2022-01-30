@@ -265,7 +265,7 @@ namespace ft
 			// Modifiers
 			void	push_back(const value_type &val)
 			{
-				if (this->_size >= this->_capacity)
+				if (this->_size + 1 > this->_capacity)
                     reallocVector(1, true);
                 this->_alloc.construct(&(this->_vector[this->_size]), val);
                 ++this->_size;
@@ -295,30 +295,24 @@ namespace ft
                     this->_size += n;
                 }
                 else
-                {//TODO fix this
-                    ft::vector<T, Alloc>  newVector;
-                    iterator    newIt = newVector.begin();
+                {
+                    pointer newVector = this->_alloc.allocate(this->_capacity + n);
+                    size_type   i = 0;
 
-                    newVector._alloc.allocate(this->_capacity + n, &newVector);
-                    newVector._capacity = this->_capacity + n;
                     for (iterator it = this->begin() ; it != position ; ++it)
-                    {
-                        newVector._alloc.construt(newIt++, *it);
-                        this->_alloc.destroy(it);
-                    }
-                    for (unsigned int i = 0 ; i < n ; ++i)
-                        newVector._alloc.construct(newIt++, val);
+                        this->_alloc.construct(&newVector[i++], *it);
+                    for (unsigned int count = 0 ; count < n ; ++count)
+                        this->_alloc.construct(&newVector[i++], val);
                     for ( ; position != this->end() ; ++position)
-                    {
-                        newVector._alloc.construct(newIt++, *position);
-                        this->_alloc.destroy(position);
-                    }
-                    newVector._size = this->_size + n;
-                    this->_alloc.deallocate(this->_vector);
+                        this->_alloc.construct(&newVector[i++], *position);
+                    this->clear();
+                    this->_alloc.deallocate(this->_vector, this->_capacity);
+                    this->_capacity += n;
+                    this->_size = i;
                     this->_vector = newVector;
                 }
 			}
-			// insert(): fill in range
+			// insert(): fill in range TODO
 			template < class InputIterator >
 			void	insert(iterator position, InputIterator first, InputIterator last,
                     typename ft::enable_if<!ft::is_integral<InputIterator>::value,
@@ -334,7 +328,7 @@ namespace ft
                     this->_alloc.destroy(&(this->_vector[this->size - 1]));
                 else
                 {
-                    //TODO relocate vector
+                    //TODO
                 }
 			}
 			// erase(): in range
@@ -359,7 +353,7 @@ namespace ft
 
 			void	clear()
 			{
-				for (value_type i ; i < this->_size ; ++i)
+				for (unsigned int i = 0 ; i < this->_size ; ++i)
                     this->_alloc.destroy(&(this->_vector[i]));
 				this->_size = 0;
 			}
@@ -420,29 +414,24 @@ namespace ft
 
             void    reallocVector(size_type n, bool copy)
             {
-                pointer  newVec = this->_alloc.allocate(this->_capacity += n);
-
-                if (copy == true)
+                if (this->_capacity == 0)
+                    this->_vector = this->_alloc.allocate(n);
+                else
                 {
-                    for (unsigned int i = 0 ; i < this->_size ; ++i)
+                    pointer  newVec = this->_alloc.allocate(this->_capacity + n);
+
+                    if (copy == true)
                     {
-                        this->_alloc.construct(&newVec[i], this->_vector[i]);
-                        this->_alloc.destroy(&(this->_vector[i]));
+                        for (unsigned int i = 0 ; i < this->_size ; ++i)
+                        {
+                            this->_alloc.construct(&newVec[i], this->_vector[i]);
+                            this->_alloc.destroy(&(this->_vector[i]));
+                        }
                     }
+                    this->_alloc.deallocate(this->_vector, this->_capacity - n);
+                    this->_vector = newVec;
                 }
-                this->_alloc.deallocate(this->_vector, this->_capacity - n);
-                this->_vector = newVec;
-            }
-
-            void    _shrinkVector(iterator position)
-            {
-                for (iterator it = position ; it != this->end() ; ++it)
-                {
-                    this->_alloc.destroy(it);
-                    --this->_size;
-                    --this->_capacity;
-                }
-                this->_alloc.deallocate(position, this->end() - position);
+                this->_capacity += n;
             }
 
             pointer _vector;

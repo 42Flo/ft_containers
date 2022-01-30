@@ -15,11 +15,14 @@ $(PATH_OBJS)	:
 					@mkdir -p $(PATH_OBJS)
 
 $(NAME)			:	$(PREFIX_OBJS)
-					@$(CC) -o $@ $(PREFIX_OBJS) $(FLAGS)
+					@$(CC) -o $@ $(PREFIX_OBJS) $(FLAGS) $(STL)
 
 $(PATH_OBJS)%.o	:	$(PATH_SRCS)%.cpp
 					@echo "Compiling "$<
-					@$(CC) -o $@ -c $< $(FLAGS)
+					@$(CC) -o $@ -c $< $(FLAGS) $(STL)
+
+stl				:	STL = -D STL_EXAMPLE=1 
+stl				:	all
 
 clean			:
 					@rm -rf $(PATH_OBJS)
