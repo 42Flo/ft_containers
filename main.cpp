@@ -21,6 +21,7 @@ int	main()
     v.push_back(4);
     v.push_back(5);
     v.insert(v.begin() + 2, 3, 0);
+    v.erase(v.end());
 
     std::cout << "size: " << v.size() << std::endl << 
         "capacity: " << v.capacity() << std::endl;

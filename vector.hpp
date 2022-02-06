@@ -154,6 +154,7 @@ namespace ft
             //TODO const iterators
 
 			typedef size_t	size_type;
+            typedef std::ptrdiff_t  difference_type;
 
 			//TODO iterator typedef and implementation
 			
@@ -256,36 +257,51 @@ namespace ft
                 return ((this->_size == 0) ? true : false);
             }
 
-            void    reserve(size_type n)
+            void    reserve(size_type n) //TODO throw lenght_error exception if n > max_size
             {
-                if (this->_capacity < n)
-                    reallocVector(n, true);
+                if (n > this->_capacity)
+                {
+                    if (this->_capacity == 0)
+                        this->_vector = this->_alloc.allocate(n);
+                    else
+                    {
+                        pointer newVec = this->_alloc.allocate(n);
+
+                        for (unsigned int i = 0 ; i < this->_size ; ++i)
+                        {
+                            this->_alloc.construct(&newVec[i], this->_vector[i]);
+                            this->_alloc.destroy(&(this->_vector[i]));
+                        }
+                        this->_alloc.deallocate(this->_vector, this->_capacity);
+                        this->_vector = newVec;
+                    }
+                    this->_capacity = n;
+                }
             }
 
-			// Modifiers
-			void	push_back(const value_type &val)
-			{
-				if (this->_size + 1 > this->_capacity)
-                    reallocVector(1, true);
+            // Modifiers
+            void	push_back(const value_type &val)
+            {
+                if (this->_size + 1 > this->_capacity)
+                    this->reserve(this->_capacity + 1);
                 this->_alloc.construct(&(this->_vector[this->_size]), val);
                 ++this->_size;
-			}
-			void	pop_back()
-			{
+            }
+            void	pop_back()
+            {
                 this->_alloc.destroy(&(this->_vector[this->_size - 1]));
                 --this->_size;
-			}
+            }
 
-			// insert(): single element
-			iterator	insert(iterator position, const value_type &val)
+            // insert(): single element
+            iterator	insert(iterator position, const value_type &val)
             {
                 this->insert(position, 1, val);
                 return (position);
             }
-			// insert(): fill
-			void	insert(iterator position, size_type n, const value_type &val)
-			{
-                std::cout << "insert fill!" << std::endl;
+            // insert(): fill
+            void	insert(iterator position, size_type n, const value_type &val)
+            {
                 if (position == this->end())
                 {
                     if (this->_size + n > this->_capacity)
@@ -311,106 +327,109 @@ namespace ft
                     this->_size = i;
                     this->_vector = newVector;
                 }
-			}
-			// insert(): fill in range TODO
-			template < class InputIterator >
-			void	insert(iterator position, InputIterator first, InputIterator last,
+            }
+            // insert(): fill in range TODO
+            template < class InputIterator >
+            void	insert(iterator position, InputIterator first, InputIterator last,
                     typename ft::enable_if<!ft::is_integral<InputIterator>::value,
                     InputIterator>::type = 0)
-			{
-                std::cout << "insert in range!" << std::endl;
-			}
-
-			// erase(): single element
-			iterator	erase(iterator position)
-			{
+            {
                 if (position == this->end())
-                    this->_alloc.destroy(&(this->_vector[this->size - 1]));
+                {
+
+                }
                 else
                 {
-                    //TODO
+
                 }
-			}
-			// erase(): in range
-			iterator	erase(iterator first, iterator last)
-			{
-                
-			}
+            }
 
-			void	swap(ft::vector<T, Alloc> &x)
-			{
-                ft::vector<T, Alloc>  tmp(*this);
+            // erase(): single element
+            iterator	erase(iterator position)
+            {
+                std::cout << "erase single element" << std::endl;
+                if (position == this->end())
+                    this->_alloc.destroy(&(this->_vector[this->_size - 1]));
+                else
+                {
+                    this->_alloc.destroy(&(*position));
+                    //for ( ; position != this->end() ; ++position)
 
-                this->clear();
-                if (this->_capacity < x.size())
-                    this->reallocVector(x.capacity() - this->_capacity, false);
-                for (unsigned int i ; i < x.size() ; ++i)
-                    this->push_back(x[i]);
-                x.clear();
-                for (unsigned int i ; i < tmp.size() ; ++i)
-                    x.push_back(tmp[i]);
-			}
+                }
+                --this->_size;
+                return (position);
+            }
+            // erase(): in range
+            iterator	erase(iterator first, iterator last)
+            {
+                //TODO
+            }
 
-			void	clear()
-			{
-				for (unsigned int i = 0 ; i < this->_size ; ++i)
+            void	swap(ft::vector<T, Alloc> &x)
+            {
+                //TODO vector values need to be swapped, no pointer should change for iterators to remain valid!!!
+            }
+
+            void	clear()
+            {
+                for (unsigned int i = 0 ; i < this->_size ; ++i)
                     this->_alloc.destroy(&(this->_vector[i]));
-				this->_size = 0;
-			}
+                this->_size = 0;
+            }
 
-			// Element access
+            // Element access
 
-			// operator []
-			reference	operator[](size_type n)
-			{ 
-				return (this->_vector[n]);
-			}
-			// const operator []
-			const_reference	operator[](size_type n) const
-			{
-				return (this->_vector[n]);
-			}
+            // operator []
+            reference	operator[](size_type n)
+            { 
+                return (this->_vector[n]);
+            }
+            // const operator []
+            const_reference	operator[](size_type n) const
+            {
+                return (this->_vector[n]);
+            }
 
-			// at()
-			reference	at(size_type n)
-			{
+            // at()
+            reference	at(size_type n)
+            {
                 if (n < this->_size)
                     throw (std::out_of_range("Error: out of range"));
-				return (this->_vector[n]);
-			}
-			// const at()
-			const_reference	at(size_type n) const
-			{
+                return (this->_vector[n]);
+            }
+            // const at()
+            const_reference	at(size_type n) const
+            {
                 if (n < this->_size)
                     throw (std::out_of_range("Error: out of range"));
-				return (this->_vector[n]);
-			}
+                return (this->_vector[n]);
+            }
 
-			// front()
-			reference	front()
-			{
-				return (this->_vector[0]);
-			}
-			// const front()
-			const_reference	front() const
-			{
-				return (this->_vector[0]);
-			}
+            // front()
+            reference	front()
+            {
+                return (this->_vector[0]);
+            }
+            // const front()
+            const_reference	front() const
+            {
+                return (this->_vector[0]);
+            }
 
-			// back()
-			reference	back()
-			{
-				return (this->_vector[this->_size - 1]);
-			}
-			// const back()
-			const_reference	back() const
-			{
-				return (this->_vector[this->_size - 1]);
-			}
+            // back()
+            reference	back()
+            {
+                return (this->_vector[this->_size - 1]);
+            }
+            // const back()
+            const_reference	back() const
+            {
+                return (this->_vector[this->_size - 1]);
+            }
 
-			allocator_type	get_allocator() const {return (this->_alloc);}
+            allocator_type	get_allocator() const {return (this->_alloc);}
 
-		private:
+        private:
 
             void    reallocVector(size_type n, bool copy)
             {
@@ -428,10 +447,33 @@ namespace ft
                             this->_alloc.destroy(&(this->_vector[i]));
                         }
                     }
-                    this->_alloc.deallocate(this->_vector, this->_capacity - n);
+                    this->_alloc.deallocate(this->_vector, this->_capacity);
                     this->_vector = newVec;
                 }
                 this->_capacity += n;
+            }
+
+            void    _shiftRight(difference_type pos, size_type n)
+            {
+                if (pos < this->_size && this->_capacity >= this->_size + n)
+                {
+                    iterator    toWrite = this->end() - 1 + n;
+                    iterator    toDelete = this->end() - 1;
+
+                    for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
+                    {
+                        this->_alloc.construct(&(*toWrite--), *toDelete);
+                        this->_alloc.destroy(&(*toDelete--));
+                    }
+                }
+            }
+
+            void    _shiftLeft(difference_type pos, size_type n)
+            {
+                if (pos < this->_size && this->_capacity >= this->_size + n)
+                {
+                    //TODO
+                }
             }
 
             pointer _vector;
