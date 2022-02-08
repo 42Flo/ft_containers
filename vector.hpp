@@ -83,13 +83,14 @@ namespace ft
 					{
 						return (this->_current - r);
 					}
-					unsigned int operator-(random_access_iterator &r)
+					difference_type operator-(random_access_iterator const &r)
 					{
-                        unsigned int    ret;
+                       /* difference_type ret = 0;
 
                         for (pointer tmp = this->_current ; tmp != r ; ++tmp)
                             ++ret;
-                        return (ret);
+                        return (ret);*/
+                        return (this->_current - r.getCurrent());
 					}
 
 					// Compound assignment
@@ -244,7 +245,7 @@ namespace ft
                 else
                 {
                     if (this->_capacity < n)
-                        reallocVector(n, true);
+                        this->reserve(n);
                     for (unsigned int i = this->_size ; i < n ; ++i)
                         this->_alloc.construct(&(this->_vector[i]), val);
                 }
@@ -282,8 +283,7 @@ namespace ft
             // Modifiers
             void	push_back(const value_type &val)
             {
-                if (this->_size + 1 > this->_capacity)
-                    this->reserve(this->_capacity + 1);
+                this->reserve(this->_size + 1);
                 this->_alloc.construct(&(this->_vector[this->_size]), val);
                 ++this->_size;
             }
@@ -302,31 +302,14 @@ namespace ft
             // insert(): fill
             void	insert(iterator position, size_type n, const value_type &val)
             {
-                if (position == this->end())
+                this->reserve(this->_size + n);
+                this->_shiftRight(position - this->begin(), n);
+                for (unsigned int i = 0 ; i < n ; ++i)
                 {
-                    if (this->_size + n > this->_capacity)
-                        reallocVector(n, true);
-                    for (unsigned int i = this->_size ; i <= n ; ++i)
-                        this->_alloc.construct(&(this->_vector[i]), val);
-                    this->_size += n;
+                    std::cout << "here" << std::endl;
+                    this->_alloc.construct(&(*position++), val);
                 }
-                else
-                {
-                    pointer newVector = this->_alloc.allocate(this->_capacity + n);
-                    size_type   i = 0;
-
-                    for (iterator it = this->begin() ; it != position ; ++it)
-                        this->_alloc.construct(&newVector[i++], *it);
-                    for (unsigned int count = 0 ; count < n ; ++count)
-                        this->_alloc.construct(&newVector[i++], val);
-                    for ( ; position != this->end() ; ++position)
-                        this->_alloc.construct(&newVector[i++], *position);
-                    this->clear();
-                    this->_alloc.deallocate(this->_vector, this->_capacity);
-                    this->_capacity += n;
-                    this->_size = i;
-                    this->_vector = newVector;
-                }
+                this->_size += n;
             }
             // insert(): fill in range TODO
             template < class InputIterator >
@@ -428,41 +411,21 @@ namespace ft
             }
 
             allocator_type	get_allocator() const {return (this->_alloc);}
-
+            
         private:
-
-            void    reallocVector(size_type n, bool copy)
-            {
-                if (this->_capacity == 0)
-                    this->_vector = this->_alloc.allocate(n);
-                else
-                {
-                    pointer  newVec = this->_alloc.allocate(this->_capacity + n);
-
-                    if (copy == true)
-                    {
-                        for (unsigned int i = 0 ; i < this->_size ; ++i)
-                        {
-                            this->_alloc.construct(&newVec[i], this->_vector[i]);
-                            this->_alloc.destroy(&(this->_vector[i]));
-                        }
-                    }
-                    this->_alloc.deallocate(this->_vector, this->_capacity);
-                    this->_vector = newVec;
-                }
-                this->_capacity += n;
-            }
 
             void    _shiftRight(difference_type pos, size_type n)
             {
-                if (pos < this->_size && this->_capacity >= this->_size + n)
+                if ((size_type)pos < this->_size && this->_capacity >= this->_size + n)
                 {
                     iterator    toWrite = this->end() - 1 + n;
                     iterator    toDelete = this->end() - 1;
 
+                    std::cout << "shift!" << std::endl;
                     for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
                     {
                         this->_alloc.construct(&(*toWrite--), *toDelete);
+                        *toDelete = 0; //maybe not needed
                         this->_alloc.destroy(&(*toDelete--));
                     }
                 }
