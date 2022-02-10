@@ -22,7 +22,7 @@ $(PATH_OBJS)%.o	:	$(PATH_SRCS)%.cpp
 					@$(CC) -o $@ -c $< $(FLAGS) $(STL)
 
 stl				:	STL = -D STL_EXAMPLE=1 
-stl				:	all
+stl				:	fclean all
 
 clean			:
 					@rm -rf $(PATH_OBJS)

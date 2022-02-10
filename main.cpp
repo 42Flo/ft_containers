@@ -4,7 +4,7 @@
 # include <iostream>
 
 # ifdef STL_EXAMPLE
-    #include <vector>
+    #include <aector>
     #include <algorithm>
     namespace ft = std;
 # else
@@ -13,21 +13,33 @@
 
 int	main()
 {
-    ft::vector<int>  v;
+    ft::vector<int> a;
+    ft::vector<int> b(10, 21);
 
-    v.push_back(1);
-    v.push_back(2);
-    v.push_back(3);
-    v.push_back(4);
-    v.push_back(5);
-    v.insert(v.end() - 3, 3, 42);
+    for (unsigned int i = 1 ; i < 6 ; ++i)
+        a.push_back(i);
+    a.insert(a.end() - 3, 3, 42);
+    a.erase(a.begin() + 2, a.end() - 2);
 
-    std::cout << "size: " << v.size() << std::endl << 
-        "capacity: " << v.capacity() << std::endl;
+    std::cout << "vector a" << std::endl;
+    for (ft::vector<int>::iterator it = a.begin() ; it != a.end() ; ++it)
+        std::cout << *it << std::endl;
+    std::cout << std::endl;
+    std::cout << "vector b" << std::endl;
+    for (ft::vector<int>::iterator it = b.begin() ; it != b.end() ; ++it)
+        std::cout << *it << std::endl;
+    std::cout << std::endl;
 
-    ft::vector<int>::iterator   it = v.begin();
+    std::cout << "swap called" << std::endl;
+    a.swap(b);
+    std::cout << std::endl;
 
-    for ( ; it != v.end() ; ++it)
+    std::cout << "vector a" << std::endl;
+    for (ft::vector<int>::iterator it = a.begin() ; it != a.end() ; ++it)
+        std::cout << *it << std::endl;
+    std::cout << std::endl;
+    std::cout << "vector b" << std::endl;
+    for (ft::vector<int>::iterator it = b.begin() ; it != b.end() ; ++it)
         std::cout << *it << std::endl;
 
     return (0);

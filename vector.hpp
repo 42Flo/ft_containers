@@ -6,6 +6,7 @@
 
 # include "reverse_iterator.hpp"
 # include "type_traits.hpp"
+# include "tools.hpp"
 
 namespace ft
 {
@@ -108,8 +109,6 @@ namespace ft
 				private:
 					pointer	_current;
 
-					// ********** Non-member opeator overloads **********
-
 					// Relational operators
 					friend bool	operator==(const random_access_iterator &l,
 							const random_access_iterator &r)
@@ -157,8 +156,6 @@ namespace ft
 			typedef size_t	size_type;
             typedef std::ptrdiff_t  difference_type;
 
-			//TODO iterator typedef and implementation
-			
 			// Constructors
 
 			// Default constructor
@@ -167,19 +164,17 @@ namespace ft
 
 			// Copy constructor
 			vector(const ft::vector<T, Alloc> &x)
-				: _size(x.size()), _capacity(x.capacity()), _alloc(x.get_allocator())
+				: _size(0), _capacity(0), _alloc(x.get_allocator())
 			{
-				this->_vector = this->_alloc.allocate(this->_capacity);
+                this->insert(this->begin(), x.begin(), x.end());
 			}
 
 			// Fill constructor
 			explicit vector(size_type n, const value_type &val = value_type()
 					, const allocator_type &alloc = allocator_type())
-				: _size(n), _capacity(n), _alloc(alloc)
+				: _size(0), _capacity(0), _alloc(alloc)
 			{
-				this->_vector = this->_alloc.allocate(this->_capacity);
-				for (unsigned int i = 0 ; i < this->_capacity ; ++i)
-					this->_alloc.construct(&(this->_vector[i]), val);
+                this->insert(this->begin(), n, val);
 			}
 
 			// Range constructor
@@ -188,14 +183,10 @@ namespace ft
                     const allocator_type &alloc = allocator_type(),
                     typename ft::enable_if<!ft::is_integral<InputIterator>::value,
                     InputIterator>::type = 0)
+                : _size(0), _capacity(0), _alloc(alloc)
 			{
-                for (InputIterator tmp = first ; tmp != last ; ++tmp)
-                    ++this->_capacity;
-                this->_vector = this->_alloc.allocate(this->_capacity);
-                for ( ; first != last ; ++first)
-                    this->push_back(*first);
+                this->insert(this->begin(), first, last);
 			}
-            //TODO tests for range constructor
 
 			// Assignation operator
 			ft::vector<T, Alloc>	operator=(const ft::vector<T, Alloc> &x)
@@ -258,8 +249,10 @@ namespace ft
                 return ((this->_size == 0) ? true : false);
             }
 
-            void    reserve(size_type n) //TODO throw lenght_error exception if n > max_size
+            void    reserve(size_type n)
             {
+                if (n > this->max_size())
+                    throw (std::length_error("reserve: length too high"));
                 if (n > this->_capacity)
                 {
                     if (this->_capacity == 0)
@@ -302,55 +295,57 @@ namespace ft
             // insert(): fill
             void	insert(iterator position, size_type n, const value_type &val)
             {
+                difference_type pos = position - this->begin();
+
                 this->reserve(this->_size + n);
-                this->_shiftRight(position - this->begin(), n);
+                this->_shiftRight(pos, n);
                 for (unsigned int i = 0 ; i < n ; ++i)
-                {
-                    std::cout << "here" << std::endl;
-                    this->_alloc.construct(&(*position++), val);
-                }
+                    this->_alloc.construct(&(this->_vector[pos++]), val);
                 this->_size += n;
             }
-            // insert(): fill in range TODO
+            // insert(): fill in range
             template < class InputIterator >
             void	insert(iterator position, InputIterator first, InputIterator last,
                     typename ft::enable_if<!ft::is_integral<InputIterator>::value,
                     InputIterator>::type = 0)
             {
-                if (position == this->end())
-                {
+                difference_type pos = position - this->begin();
 
-                }
-                else
+                this->reserve(this->_size + (last - first));
+                this->_shitftRight(pos, last - first);
+                for ( ; first != last ; ++first)
                 {
-
+                    this->_alloc.construct(&(this->_vector[pos++]), *first);
+                    ++this->_size;
                 }
             }
 
             // erase(): single element
             iterator	erase(iterator position)
             {
-                std::cout << "erase single element" << std::endl;
-                if (position == this->end())
-                    this->_alloc.destroy(&(this->_vector[this->_size - 1]));
-                else
-                {
-                    this->_alloc.destroy(&(*position));
-                    //for ( ; position != this->end() ; ++position)
-
-                }
+                this->_alloc.destroy(&(*position));
+                this->_shiftLeft(position - this->begin(), 1);
                 --this->_size;
                 return (position);
             }
             // erase(): in range
             iterator	erase(iterator first, iterator last)
             {
-                //TODO
+                difference_type n = last - first;
+
+                for ( ; first != last ; ++first)
+                    this->_alloc.destroy(&(*first));
+                this->_shiftLeft(last - this->begin() - 1, n);
+                this->_size -= n;
+                return (last);
             }
 
             void	swap(ft::vector<T, Alloc> &x)
             {
-                //TODO vector values need to be swapped, no pointer should change for iterators to remain valid!!!
+                ft::swap(this->_vector, x._vector);
+                ft::swap(this->_size, x._size);
+                ft::swap(this->_capacity, x._capacity);
+                ft::swap(this->_alloc, x._alloc);
             }
 
             void	clear()
@@ -377,14 +372,14 @@ namespace ft
             reference	at(size_type n)
             {
                 if (n < this->_size)
-                    throw (std::out_of_range("Error: out of range"));
+                    throw (std::out_of_range("at: out of range"));
                 return (this->_vector[n]);
             }
             // const at()
             const_reference	at(size_type n) const
             {
                 if (n < this->_size)
-                    throw (std::out_of_range("Error: out of range"));
+                    throw (std::out_of_range("at: out of range"));
                 return (this->_vector[n]);
             }
 
@@ -418,10 +413,9 @@ namespace ft
             {
                 if ((size_type)pos < this->_size && this->_capacity >= this->_size + n)
                 {
-                    iterator    toWrite = this->end() - 1 + n;
+                    iterator    toWrite = this->end() + n - 1;
                     iterator    toDelete = this->end() - 1;
 
-                    std::cout << "shift!" << std::endl;
                     for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
                     {
                         this->_alloc.construct(&(*toWrite--), *toDelete);
@@ -433,9 +427,17 @@ namespace ft
 
             void    _shiftLeft(difference_type pos, size_type n)
             {
-                if (pos < this->_size && this->_capacity >= this->_size + n)
+                if ((size_type)pos < this->_size)
                 {
-                    //TODO
+                    iterator    toWrite = this->begin() + pos - n + 1;
+                    iterator    toDelete = this->begin() + pos + 1;
+
+                    for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
+                    {
+                        this->_alloc.construct(&(*toWrite++), *toDelete);
+                        *toDelete = 0; //same
+                        this->_alloc.destroy(&(*toDelete++));
+                    }
                 }
             }
 
@@ -443,6 +445,44 @@ namespace ft
             size_type	_size;
             size_type	_capacity;
             allocator_type  _alloc;
+
+            friend bool operator==(const vector<T, Alloc> &l,
+                    const vector<T, Alloc> &r)
+            {
+                if (l.size() == r.size())
+                {
+                    for (unsigned int i = 0 ; i < l.size() ; ++i)
+                        if (r[i] != l[i])
+                            return (false);
+                    return (true);
+                }
+                return (false);
+            }
+            friend bool operator!=(const vector<T, Alloc> &l,
+                    const vector<T, Alloc> &r)
+            {
+                return (!(l == r));
+            }
+            friend bool operator<(const vector<T, Alloc> &l,
+                    const vector<T, Alloc> &r)
+            {
+                return (lexicographical_compare(l.begin(), l.end(), r.begin(), r.end()));
+            }
+            friend bool operator<=(const vector<T, Alloc> &l,
+                    const vector<T, Alloc> &r)
+            {
+                return (!(r < l));
+            }
+            friend bool operator>(const vector<T, Alloc> &l,
+                    const vector<T, Alloc> &r)
+            {
+                return (r < l);
+            }
+            friend bool operator>=(const vector<T, Alloc> &l,
+                    const vector<T, Alloc> &r)
+            {
+                return (!(l < r));
+            }
     };
 }
 
