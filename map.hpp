@@ -26,7 +26,6 @@ namespace ft
             //TODO iterators
             typedef size_t                                      size_type;
             typedef ptrdiff_t                                   difference_type;
-            //TODO rebind allocator for node
 
         private:
             class value_compare : std::binary_function<value_type, value_type, bool>
@@ -40,9 +39,22 @@ namespace ft
                     {
                         return (comp(x.first, y.first));
                     }
+            };            
+
+            struct Node
+            {
+                value_type  pair;
+                bool        color;
+                pointer     left;
+                pointer     right;
             };
 
         public:
+            using node_alloc = typename std::allocator_traits<Alloc>::template
+                rebind_alloc<Node>;
+            //typedef typename std::allocator_traits<Alloc>::template
+            //    rebind_alloc<Node> node_alloc;
+
             // Default constructor
             explicit map(const key_compare &comp = key_compare(),
                 const allocator_type &alloc = allocator_type())
@@ -90,18 +102,11 @@ namespace ft
             allocator_type  get_allocator() const { return (this->_alloc);}
 
         private:
-            struct Node
-            {
-                value_type  pair;
-                bool        color;
-                pointer     left;
-                pointer     right;
-            };
-
-            Node            _current;
+            Node            *_map;
             key_compare     _comp;
-            allocator_type  _alloc;
             size_type       _size;
+            allocator_type  _alloc;
+            node_alloc      _node_alloc;
     };
 }
 
