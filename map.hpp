@@ -2,15 +2,15 @@
 # define MAP_HPP
 
 # include <iostream>
-# include <functional>
 # include <memory>
 
 # include "type_traits.hpp"
+# include "rb_tree.hpp"
 
 namespace ft
 {
     template < class Key, class T, class Compare = std::less<Key>,
-             class Alloc = std::allocator<std::pair<const Key, T>> >
+             class Alloc = std::allocator< std::pair<const Key, T> > >
     class map
     {
        public:
@@ -27,31 +27,17 @@ namespace ft
             typedef size_t                                      size_type;
             typedef ptrdiff_t                                   difference_type;
 
+            //using node_alloc = typename std::allocator_traits<Alloc>::template
+            //    rebind_alloc<Node>;
+
         private:
-            class value_compare : std::binary_function<value_type, value_type, bool>
-            {
-                private:
-                    Compare comp;
-                    value_compare(Compare c) : comp(c){}
-
-                public:
-                    bool    operator()(const value_type &x, const value_type &y) const
-                    {
-                        return (comp(x.first, y.first));
-                    }
-            };            
-
-            struct Node
-            {
-                value_type  pair;
-                bool        color;
-                pointer     left;
-                pointer     right;
-            };
+            RBTree<T, Alloc>    _map;
+            key_compare         _comp;
+            size_type           _size;
+            allocator_type      _alloc;
+            //node_alloc      _node_alloc;
 
         public:
-            using node_alloc = typename std::allocator_traits<Alloc>::template
-                rebind_alloc<Node>;
             //typedef typename std::allocator_traits<Alloc>::template
             //    rebind_alloc<Node> node_alloc;
 
@@ -90,23 +76,33 @@ namespace ft
 
             bool    empty() const { return ((this->_size == 0) ? true : false);}
 
-            // Observers
-            key_compare key_comp() const { return (this->_comp);}
+            // Element access
 
-            value_compare   value_comp() const
+            mapped_type &operator[](const key_type &k)
             {
                 //TODO
             }
+
+            // Observers
+            key_compare key_comp() const { return (this->_comp);}
+
+            class value_compare : std::binary_function<value_type, value_type, bool>
+            {
+                private:
+                    Compare comp;
+                    value_compare(Compare c) : comp(c){}
+
+                public:
+                    bool    operator()(const value_type &x, const value_type &y) const
+                    {
+                        return (comp(x.first, y.first));
+                    }
+            };
 
             // Allocator
             allocator_type  get_allocator() const { return (this->_alloc);}
 
         private:
-            Node            *_map;
-            key_compare     _comp;
-            size_type       _size;
-            allocator_type  _alloc;
-            node_alloc      _node_alloc;
     };
 }
 

@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <stdexcept>
+# include <cstddef>
 
 # include "reverse_iterator.hpp"
 # include "type_traits.hpp"
@@ -17,10 +18,10 @@ namespace ft
 			class random_access_iterator
 			{
 				public:
-					typedef T	value_type;
+					typedef T	            value_type;
 					typedef std::ptrdiff_t	difference_type;
-					typedef T&	reference;
-					typedef T*	pointer;
+					typedef T&	            reference;
+					typedef T*	            pointer;
 
                     // Default constructor
 					random_access_iterator(pointer val = 0) : _current(val){}

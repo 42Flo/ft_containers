@@ -4,11 +4,14 @@
 # include <iostream>
 
 # ifdef STL_EXAMPLE
-    #include <aector>
+    #include <vector>
+    #include <stack>
     #include <algorithm>
     namespace ft = std;
 # else
     #include "vector.hpp"
+    #include "stack.hpp"
+    #include "map.hpp"
 # endif
 
 int	main()
@@ -41,6 +44,10 @@ int	main()
     std::cout << "vector b" << std::endl;
     for (ft::vector<int>::iterator it = b.begin() ; it != b.end() ; ++it)
         std::cout << *it << std::endl;
+
+    RBTree<int>  tree;
+
+    tree.insert(42);
 
     return (0);
 }
