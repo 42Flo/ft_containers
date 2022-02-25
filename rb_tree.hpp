@@ -23,9 +23,10 @@ class RBTree
         class Node
         {
             public:
-                Node(value_type &val) : left(NULL), right(NULL), parent(NULL),
-                    color(BLACK)
+                Node(value_type &val) : color(RED), left(NULL), right(NULL),
+                    parent(NULL), alloc(alloc_type())
                 {
+                    this->alloc.construct(&(this->data), val);
                     std::cout << "Node constructor called!" << std::endl;
                 }
 
@@ -34,20 +35,21 @@ class RBTree
                 Node        *left;
                 Node        *right;
                 Node        *parent;
+                alloc_type  alloc;
         };
 
         typedef typename Alloc::template rebind<Node>::other node_alloc_type;
-        typedef Node*   node_ptr;
-        typedef Node&   node_ref;
 
         RBTree() : _root(NULL), _node_alloc(node_alloc_type()), _alloc(alloc_type())
         {
         }
 
-        node_ptr    createNode(value_type data)
+        Node    *createNode(value_type &data)
         {
-            //TODO create node and call node constructor to init value,
-            //allocate node with allocator
+            Node    *newNode = this->_node_alloc.allocate(1);
+
+            this->_node_alloc.construct(newNode, data);
+            return (newNode);
         }
 
         void    rotateLeft(Node *current)
@@ -78,13 +80,33 @@ class RBTree
         {
             if (this->_root == NULL)
             {
-                std::cout << "rbtree insert here!" << std::endl;
-                _root = createNode(data);
+                this->_root = createNode(data);
+                this->_root->color = BLACK;
+            }
+            else
+            {
+                Node    *newNode = createNode(data);
+                Node    *tmp = this->_root;
+                Node    *tmp2;
+
+                while (tmp != NULL)
+                {
+                    tmp2 = tmp;
+                    if (data > tmp->data)
+                        tmp = tmp->right;
+                    else
+                        tmp = tmp->left;
+                }
+                tmp = newNode;
+                newNode->parent = tmp2;
+                if (newNode->parent->parent == NULL)
+                    return ;
+                //TODO insert fix
             }
         }
 
     private:
-        node_ptr        *_root;
+        Node            *_root;
         node_alloc_type _node_alloc;  
         alloc_type      _alloc;
         
