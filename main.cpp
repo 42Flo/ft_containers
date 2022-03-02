@@ -16,6 +16,7 @@
 
 int	main()
 {
+    /*
     ft::vector<int> a;
     ft::vector<int> b(10, 21);
 
@@ -44,10 +45,22 @@ int	main()
     std::cout << "vector b" << std::endl;
     for (ft::vector<int>::iterator it = b.begin() ; it != b.end() ; ++it)
         std::cout << *it << std::endl;
-
+*/
     RBTree<int>  tree;
 
-    tree.insert(42);
+    tree.insert(10);
+    tree.insert(18);
+    tree.insert(7);
+    tree.insert(15);
+    tree.insert(16);
+    tree.insert(30);
+    tree.insert(25);
+    tree.insert(40);
+    tree.insert(60);
+    tree.insert(2);
+    tree.insert(1);
+    tree.insert(70);
+    tree.display(tree.getRoot(), "", true);
 
     return (0);
 }

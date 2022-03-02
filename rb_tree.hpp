@@ -27,7 +27,6 @@ class RBTree
                     parent(NULL), alloc(alloc_type())
                 {
                     this->alloc.construct(&(this->data), val);
-                    std::cout << "Node constructor called!" << std::endl;
                 }
 
                 value_type  data;
@@ -40,10 +39,11 @@ class RBTree
 
         typedef typename Alloc::template rebind<Node>::other node_alloc_type;
 
-        RBTree() : _root(NULL), _node_alloc(node_alloc_type()), _alloc(alloc_type())
-        {
-        }
-       
+        RBTree() : _root(NULL), _node_alloc(node_alloc_type()),
+            _alloc(alloc_type()){}
+
+        Node const  *getRoot() const {return (this->_root);}
+
         void    insert(value_type data)
         {
             if (this->_root == NULL)
@@ -65,14 +65,38 @@ class RBTree
                     else
                         tmp = tmp->left;
                 }
-                tmp = newNode;
+                tmp2->data < newNode->data ? tmp2->right = newNode : tmp2->left = newNode;
                 newNode->parent = tmp2;
                 if (newNode->parent->parent != NULL)
                     _insertBalance(newNode);
             }
         }
 
+        void    display(Node const *node, std::string indent, bool side) const
+        {
+            if (node != NULL)
+            {
+                std::cout << indent;
+                if (side)
+                {
+                    std::cout << "R----";
+                    indent += "   ";
+                }
+                else
+                {
+                    std::cout << "L----";
+                    indent += "|  ";
+                }
+                std::string color = node->color ? "RED" : "BLACK";
+                std::cout << node->data << "(" << color << ")" << std::endl;
+                display(node->left, indent, false);
+                display(node->right, indent, true);
+            }
+        }
+
     private:
+        Node            *_root;
+
         Node    *_createNode(value_type &data)
         {
             Node    *newNode = this->_node_alloc.allocate(1);
@@ -103,10 +127,17 @@ class RBTree
             *node = (*node)->parent->parent;
         }
 
+        bool    _isUncleRed(Node *uncle)
+        {
+            if (uncle != NULL)
+                if (uncle->color == RED)
+                    return (true);
+            return (false);
+        }
 
         void    _insertBalanceRight(Node **node)
         {
-            if ((*node)->parent->parent->left->color == RED)
+            if (_isUncleRed((*node)->parent->parent->left) == true)
                 _insertUncleRedFix((*node)->parent->parent->left, node);
             else
             {
@@ -123,7 +154,7 @@ class RBTree
 
         void    _insertBalanceLeft(Node **node)
         {
-            if ((*node)->parent->parent->right->color == RED)
+            if (_isUncleRed((*node)->parent->parent->right) == true)
                 _insertUncleRedFix((*node)->parent->parent->right, node);
             else
             {
@@ -136,36 +167,44 @@ class RBTree
                 (*node)->parent->parent->color = RED;
                 _rotateRight((*node)->parent->parent);
             }
-
-        }
-
-        void    _rotateLeft(Node *current)
-        {
-            Node    *x = current->right;
-            Node    *y = x->left;
-
-            x->left = current;
-            current->right = y;
-            current->parent = x;
-            if (y != NULL)
-                y->parent = current;
-            //TODO check state of root parent ptr
         }
 
         void    _rotateRight(Node *current)
         {
             Node    *x = current->left;
-            Node    *y = x->right;
 
+            current->left = x->right;
+            if (x->right != NULL)
+                x->right->parent = current;
+            x->parent = current->parent;
+            if (current->parent == NULL)
+                this->_root = x;
+            else if (current == current->parent->right)
+                current->parent->right = x;
+            else
+                current->parent->left = x;
             x->right = current;
-            current->left = y;
             current->parent = x;
-            if (y != NULL)
-                y->parent = current;
-            //same
         }
 
-        Node            *_root;
+        void    _rotateLeft(Node *current)
+        {
+            Node    *x = current->right;
+
+            current->right = x->left;
+            if (x->left != NULL)
+                x->left->parent = current;
+            x->parent = current->parent;
+            if (current->parent == NULL)
+                this->_root = x;
+            else if (current == current->parent->left)
+                current->parent->left = x;
+            else
+                current->parent->right = x;
+            x->left = current;
+            current->parent = x;
+        }
+
         node_alloc_type _node_alloc;  
         alloc_type      _alloc;
 
