@@ -42,7 +42,7 @@ class RBTree
         RBTree() : _root(NULL), _node_alloc(node_alloc_type()),
             _alloc(alloc_type()){}
 
-        Node const  *getRoot() const {return (this->_root);}
+        Node    *getRoot() const {return (this->_root);}
 
         void    insert(value_type data)
         {
@@ -72,6 +72,8 @@ class RBTree
             }
         }
 
+        //TODO delete
+
         void    display(Node const *node, std::string indent, bool side) const
         {
             if (node != NULL)
@@ -92,6 +94,20 @@ class RBTree
                 display(node->left, indent, false);
                 display(node->right, indent, true);
             }
+        }
+
+        Node    *operator[](value_type data)
+        {
+            Node    *tmp = this->_root;
+
+            while (tmp != NULL && tmp->data != data)
+            {
+                if (data > tmp->data)
+                    tmp = tmp->right;
+                else
+                    tmp = tmp->left;
+            }
+            return (tmp);
         }
 
     private:
