@@ -5,6 +5,8 @@
 # include <functional>
 # include <memory>
 
+# include "tools.hpp"
+
 # define BLACK 0
 # define RED 1
 
@@ -27,6 +29,30 @@ class RBTree
                     parent(NULL), alloc(alloc_type())
                 {
                     this->alloc.construct(&(this->data), val);
+                }
+                ~Node()
+                {
+                    this->alloc.destroy(&(this->data));
+                }
+
+                Node    *getSibling() const
+                {
+                    if (this->parent == NULL)
+                        return (NULL);
+                    else if (this == this->parent->right)
+                        return (this->parent->left);
+                    else
+                        return (this->parent->right);
+                }
+
+                Node    *getUncle() const
+                {
+                    if (this->parent == NULL || this->parent->parent == NULL)
+                        return (NULL);
+                    else if (this->parent == this->parent->parent->right)
+                        return (this->parent->parent->left);
+                    else
+                        return (this->parent->parent->right);
                 }
 
                 value_type  data;
@@ -54,8 +80,7 @@ class RBTree
             else
             {
                 Node    *newNode = _createNode(data);
-                Node    *tmp = this->_root;
-                Node    *tmp2 = tmp;
+                Node    *tmp = this->_root, *tmp2 = tmp;
 
                 while (tmp != NULL)
                 {
@@ -72,7 +97,24 @@ class RBTree
             }
         }
 
-        //TODO delete
+        void    deleteNode(Node *node)
+        {
+            Node    *r = _getReplaceNode(node);
+
+            // Case 1: r == NULL, node is leaf
+            if (r == NULL)
+                _deleteLeaf(node, r);
+            // Case 2: node->left == NULL || node->right == NULL, node has 1 child
+            else if (node->left == NULL || node->right == NULL)
+                _deleteNodeOneChild(node, r);
+            // Case 3: else~ node has 2 childs, swap with succesor and recurse
+            else
+            {
+                ft::swap(r->data, node->data);
+                this->_node_alloc.destroy(r);
+                this->_node_alloc.deallocate(r);
+            }
+        }
 
         void    display(Node const *node, std::string indent, bool side) const
         {
@@ -121,11 +163,33 @@ class RBTree
             return (newNode);
         }
 
+        /*Node    *_getSibling(Node *node)
+        {
+           if (node == node->parent->right) 
+               return (node->parent->left);
+           else
+               return (node->parent->right);
+        }
+
+        Node    *_getUncle(Node *node)
+        {
+            if (node->parent == node->parent->parent->right)
+                return (node->parent->parent->left);
+            else
+                return (node->parent->parent->right);
+        }*/
+
+        // Insert helpers functions
         void    _insertBalance(Node *node)
         {
+            Node    *uncle;
+
             while (node->parent->color == RED)
             {
-                if (node->parent == node->parent->parent->right)
+                uncle = node->getUncle();
+                if (uncle != NULL && uncle->color == RED)
+                    _fixUncleRed(uncle, &node);
+                else if (node->parent == node->parent->parent->right)
                     _insertBalanceRight(&node);
                 else
                     _insertBalanceLeft(&node);
@@ -135,7 +199,7 @@ class RBTree
             this->_root->color = BLACK;
         }
 
-        void    _insertUncleRedFix(Node *uncle, Node **node)
+        void    _fixUncleRed(Node *uncle, Node **node)
         {
             uncle->color = BLACK;
             (*node)->parent->color = BLACK;
@@ -143,45 +207,86 @@ class RBTree
             *node = (*node)->parent->parent;
         }
 
-        bool    _isUncleRed(Node *uncle)
-        {
-            if (uncle != NULL)
-                if (uncle->color == RED)
-                    return (true);
-            return (false);
-        }
-
         void    _insertBalanceRight(Node **node)
         {
-            if (_isUncleRed((*node)->parent->parent->left) == true)
-                _insertUncleRedFix((*node)->parent->parent->left, node);
-            else
+            if (*node == (*node)->parent->left)
             {
-                if (*node == (*node)->parent->left)
-                {
-                    *node = (*node)->parent;
-                    _rotateRight(*node);
-                }
-                (*node)->parent->color = BLACK;
-                (*node)->parent->parent->color = RED;
-                _rotateLeft((*node)->parent->parent);
+                *node = (*node)->parent;
+                _rotateRight(*node);
             }
+            (*node)->parent->color = BLACK;
+            (*node)->parent->parent->color = RED;
+            _rotateLeft((*node)->parent->parent);
         }
 
         void    _insertBalanceLeft(Node **node)
         {
-            if (_isUncleRed((*node)->parent->parent->right) == true)
-                _insertUncleRedFix((*node)->parent->parent->right, node);
+            if (*node == (*node)->parent->right)
+            {
+                *node = (*node)->parent;
+                _rotateLeft(*node);
+            }
+            (*node)->parent->color = BLACK;
+            (*node)->parent->parent->color = RED;
+            _rotateRight((*node)->parent->parent);
+        }
+
+        // Delete helpers functions
+        Node    *_getSuccessor(Node *node)
+        {
+            Node    *tmp = node;
+
+            while (tmp->left != NULL)
+                tmp = tmp->left;
+            return (tmp);
+        }
+
+        Node    *_getReplaceNode(Node *node)
+        {
+            if (node->left != NULL && node->right != NULL)
+                return (_getSuccessor(node->right));
+            else if (node->left != NULL)
+                return (node->left);
+            else if (node->right != NULL)
+                return (node->right);
+            return (NULL);
+        }
+
+        void    _fixDoubleBlack(Node *node)
+        {
+           if (node == this->_root) 
+               return;
+           Node *sibling = node->getSibling();
+           if (sibling == NULL)
+               _fixDoubleBlack(node->parent);
+           else
+           {
+                //TODO sibling RED, BLACK cases
+           }
+        }
+
+        void    _deleteLeaf(Node *node, Node *r)
+        {
+            if (node == this->_root)
+                this->_root = NULL;
             else
             {
-                if (*node == (*node)->parent->right)
+                if ((r == NULL || r->color == BLACK) && node->color == BLACK)
                 {
-                    *node = (*node)->parent;
-                    _rotateLeft(*node);
+                    //TODO fix double black
                 }
-                (*node)->parent->color = BLACK;
-                (*node)->parent->parent->color = RED;
-                _rotateRight((*node)->parent->parent);
+            }
+        }
+
+        void    _deleteNodeOneChild(Node *node, Node *r)
+        {
+            if (node == this->_root)
+            {
+                node->data = r->data;
+                node->left =  NULL;
+                node->right = NULL;
+                this->_node_alloc.destroy(r);
+                this->_node_alloc.deallocate(r);
             }
         }
 
