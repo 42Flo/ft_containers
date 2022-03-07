@@ -55,6 +55,22 @@ class RBTree
                         return (this->parent->parent->right);
                 }
 
+                bool    isRightChild() const
+                {
+                    return (this->parent->right == this);
+                }
+
+                bool    isLeftChild() const
+                {
+                    return (this->parent->left == this);
+                }
+
+                bool    hasRedChild() const
+                {
+                    return ((this->left != NULL && this->left->color == RED) ||
+                            (this->right != NULL && this->right->color == RED));
+                }
+
                 value_type  data;
                 bool        color;
                 Node        *left;
@@ -100,19 +116,16 @@ class RBTree
         void    deleteNode(Node *node)
         {
             Node    *r = _getReplaceNode(node);
+            bool    isDB = _checkDoubleBlack(node, r);
 
-            // Case 1: r == NULL, node is leaf
             if (r == NULL)
-                _deleteLeaf(node, r);
-            // Case 2: node->left == NULL || node->right == NULL, node has 1 child
+                _deleteLeaf(node, r, isDB);
             else if (node->left == NULL || node->right == NULL)
-                _deleteNodeOneChild(node, r);
-            // Case 3: else~ node has 2 childs, swap with succesor and recurse
+                _deleteNodeOneChild(node, r, isDB);
             else
             {
                 ft::swap(r->data, node->data);
-                this->_node_alloc.destroy(r);
-                this->_node_alloc.deallocate(r);
+                deleteNode(r);
             }
         }
 
@@ -163,24 +176,8 @@ class RBTree
             return (newNode);
         }
 
-        /*Node    *_getSibling(Node *node)
-        {
-           if (node == node->parent->right) 
-               return (node->parent->left);
-           else
-               return (node->parent->right);
-        }
-
-        Node    *_getUncle(Node *node)
-        {
-            if (node->parent == node->parent->parent->right)
-                return (node->parent->parent->left);
-            else
-                return (node->parent->parent->right);
-        }*/
-
         // Insert helpers functions
-        void    _insertBalance(Node *node)
+        void    _insertBalance(Node *node)//TODO try recursif
         {
             Node    *uncle;
 
@@ -189,7 +186,7 @@ class RBTree
                 uncle = node->getUncle();
                 if (uncle != NULL && uncle->color == RED)
                     _fixUncleRed(uncle, &node);
-                else if (node->parent == node->parent->parent->right)
+                else if (node->parent->isRightChild())
                     _insertBalanceRight(&node);
                 else
                     _insertBalanceLeft(&node);
@@ -209,7 +206,7 @@ class RBTree
 
         void    _insertBalanceRight(Node **node)
         {
-            if (*node == (*node)->parent->left)
+            if ((*node)->isLeftChild())
             {
                 *node = (*node)->parent;
                 _rotateRight(*node);
@@ -221,7 +218,7 @@ class RBTree
 
         void    _insertBalanceLeft(Node **node)
         {
-            if (*node == (*node)->parent->right)
+            if ((*node)->isRightChild())
             {
                 *node = (*node)->parent;
                 _rotateLeft(*node);
@@ -252,6 +249,41 @@ class RBTree
             return (NULL);
         }
 
+        void    _siblingRedChild(Node *node, Node *sibling)
+        {
+            if (sibling->left != NULL && sibling->left->color == RED)
+            {
+                if (sibling->isLeftChild())
+                {
+                    sibling->left->color = sibling->color;
+                    sibling->color = node->parent->color;
+                    rotateRight(node->parent);
+                }
+                else
+                {
+                    sibling->left->color = node->parent->color;
+                    rotateRight(sibling);
+                    rotateLeft(node->parent);
+                }
+            }
+            else
+            {
+                if (sibling->isLeftChild())
+                {
+                    sibling->right->color = node->parent->color;
+                    rotateLeft(sibling);
+                    rotateRight(node->parent);
+                }
+                else
+                {
+                    sibling->right->color = sibling->color;
+                    sibling->color = node->parent->sibling->color;
+                    rotateLeft(node->parent);
+                }
+            }
+            node->parent->color = BLACK;
+        }
+
         void    _fixDoubleBlack(Node *node)
         {
            if (node == this->_root) 
@@ -261,24 +293,57 @@ class RBTree
                _fixDoubleBlack(node->parent);
            else
            {
-                //TODO sibling RED, BLACK cases
+               if (sibling->color == RED)
+               {
+                    node->parent->color = RED;
+                    sibling->color = BLACK;
+                    if (sibling->isLeftChild())
+                        _rotateRight(node->parent);
+                    else
+                        _rotateLeft(node->parent);
+                    _fixDoubleBlack(node);
+               }
+               else
+               {
+                    if (sibling->hasRedChild())
+                        _siblingRedChild(node, sibling);
+                    else
+                    {
+                        sibling->color = RED;
+                        if (node->parent->color == BLACK)
+                            _fixDoubleBlack(node->parent);
+                        else
+                            node->parent->color = BLACK;
+                    }
+               }
            }
         }
 
-        void    _deleteLeaf(Node *node, Node *r)
+        bool    _checkDoubleBlack(Node *node, Node *r)
+        {
+            return ((r == NULL || r->color == BLACK) && node->color == BLACK);
+        }
+
+        void    _deleteLeaf(Node *node, Node *r, bool isDB)
         {
             if (node == this->_root)
                 this->_root = NULL;
             else
             {
-                if ((r == NULL || r->color == BLACK) && node->color == BLACK)
-                {
-                    //TODO fix double black
-                }
+                if (isDB)
+                    _fixDoubleBlack(node);
+                else if (node->getSibling() != NULL)
+                    node->getSibling()->color = RED;
             }
+            if (node->isLeftChild())
+                node->parent->left = NULL;
+            else
+                node->parent->right = NULL;
+            this->_node_alloc.destroy(node);
+            this->node_alloc.deallocate(node);
         }
 
-        void    _deleteNodeOneChild(Node *node, Node *r)
+        void    _deleteNodeOneChild(Node *node, Node *r, bool isDB)
         {
             if (node == this->_root)
             {
@@ -287,6 +352,22 @@ class RBTree
                 node->right = NULL;
                 this->_node_alloc.destroy(r);
                 this->_node_alloc.deallocate(r);
+            }
+            else
+            {
+                Node    *parent = node->parent;
+
+                if (node->isLeftChild())
+                    parent->left = r;
+                else
+                    parent->right = r;
+                this->_node_alloc.destroy(node);
+                this->_node_alloc.deallocate(node);
+                r->parent = parent;
+                if (isDB)
+                    _fixDoubleBlack(r);
+                else
+                    r->color = BLACK;
             }
         }
 
@@ -300,7 +381,7 @@ class RBTree
             x->parent = current->parent;
             if (current->parent == NULL)
                 this->_root = x;
-            else if (current == current->parent->right)
+            else if (current->isRightChild())
                 current->parent->right = x;
             else
                 current->parent->left = x;
@@ -318,7 +399,7 @@ class RBTree
             x->parent = current->parent;
             if (current->parent == NULL)
                 this->_root = x;
-            else if (current == current->parent->left)
+            else if (current->isLeftChild())
                 current->parent->left = x;
             else
                 current->parent->right = x;
