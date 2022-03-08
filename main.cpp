@@ -62,6 +62,12 @@ int	main()
     tree.insert(70);
     tree.display(tree.getRoot(), "", true);
 
+    tree.deleteNode(tree[60]);
+    tree.deleteNode(tree[18]);
+    tree.deleteNode(tree[16]);
+    tree.deleteNode(tree[2]);
+    tree.display(tree.getRoot(), "", true);
+
     return (0);
 }
 

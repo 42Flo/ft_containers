@@ -77,7 +77,7 @@ class RBTree
                 Node        *right;
                 Node        *parent;
                 alloc_type  alloc;
-        };
+        }; //TODO move Node outside to use it in iterators
 
         typedef typename Alloc::template rebind<Node>::other node_alloc_type;
 
@@ -119,7 +119,7 @@ class RBTree
             bool    isDB = _checkDoubleBlack(node, r);
 
             if (r == NULL)
-                _deleteLeaf(node, r, isDB);
+                _deleteLeaf(node, isDB);
             else if (node->left == NULL || node->right == NULL)
                 _deleteNodeOneChild(node, r, isDB);
             else
@@ -257,13 +257,13 @@ class RBTree
                 {
                     sibling->left->color = sibling->color;
                     sibling->color = node->parent->color;
-                    rotateRight(node->parent);
+                    _rotateRight(node->parent);
                 }
                 else
                 {
                     sibling->left->color = node->parent->color;
-                    rotateRight(sibling);
-                    rotateLeft(node->parent);
+                    _rotateRight(sibling);
+                    _rotateLeft(node->parent);
                 }
             }
             else
@@ -271,14 +271,14 @@ class RBTree
                 if (sibling->isLeftChild())
                 {
                     sibling->right->color = node->parent->color;
-                    rotateLeft(sibling);
-                    rotateRight(node->parent);
+                    _rotateLeft(sibling);
+                    _rotateRight(node->parent);
                 }
                 else
                 {
                     sibling->right->color = sibling->color;
-                    sibling->color = node->parent->sibling->color;
-                    rotateLeft(node->parent);
+                    sibling->color = node->parent->color;
+                    _rotateLeft(node->parent);
                 }
             }
             node->parent->color = BLACK;
@@ -324,7 +324,7 @@ class RBTree
             return ((r == NULL || r->color == BLACK) && node->color == BLACK);
         }
 
-        void    _deleteLeaf(Node *node, Node *r, bool isDB)
+        void    _deleteLeaf(Node *node, bool isDB)
         {
             if (node == this->_root)
                 this->_root = NULL;
@@ -340,7 +340,7 @@ class RBTree
             else
                 node->parent->right = NULL;
             this->_node_alloc.destroy(node);
-            this->node_alloc.deallocate(node);
+            this->_node_alloc.deallocate(node, 1);
         }
 
         void    _deleteNodeOneChild(Node *node, Node *r, bool isDB)
@@ -351,7 +351,7 @@ class RBTree
                 node->left =  NULL;
                 node->right = NULL;
                 this->_node_alloc.destroy(r);
-                this->_node_alloc.deallocate(r);
+                this->_node_alloc.deallocate(r, 1);
             }
             else
             {
@@ -362,7 +362,7 @@ class RBTree
                 else
                     parent->right = r;
                 this->_node_alloc.destroy(node);
-                this->_node_alloc.deallocate(node);
+                this->_node_alloc.deallocate(node, 1);
                 r->parent = parent;
                 if (isDB)
                     _fixDoubleBlack(r);

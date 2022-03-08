@@ -14,7 +14,23 @@ namespace ft
              class Alloc = std::allocator< ft::pair<const Key, T> > >
     class map
     {
-       public:
+        private:
+            class bidirectional_iterator
+            {
+                public:
+                    typedef Key     key_type;
+                    typedef T       mapped_type;
+
+                    bidirectional_iterator()
+                    {
+
+                    }
+
+                private:
+
+            };
+
+        public:
             typedef Key                                         key_type;
             typedef T                                           mapped_type;
             typedef std::pair<const key_type, mapped_type>      value_type;
@@ -28,21 +44,7 @@ namespace ft
             typedef size_t                                      size_type;
             typedef ptrdiff_t                                   difference_type;
 
-            //using node_alloc = typename std::allocator_traits<Alloc>::template
-            //    rebind_alloc<Node>;
-
-        private:
-            RBTree<T, Alloc>    _map;
-            key_compare         _comp;
-            size_type           _size;
-            allocator_type      _alloc;
-            //node_alloc      _node_alloc;
-
-        public:
-            //typedef typename std::allocator_traits<Alloc>::template
-            //    rebind_alloc<Node> node_alloc;
-
-            // Default constructor
+            // Default
             explicit map(const key_compare &comp = key_compare(),
                 const allocator_type &alloc = allocator_type())
                 : _comp(comp), _alloc(alloc)
@@ -50,20 +52,20 @@ namespace ft
                 //TODO
             }
 
-            // Range constructor
-            template < class InputIterator >
-            map(InputIterator first, InputIterator last,
-                const key_compare &comp = key_compare(),
-                const allocator_type &alloc = allocator_type())
-                : _comp(comp), _alloc(alloc)
+            // Copy
+            map(const map &x)
             {
                 //TODO
             }
 
-            // Copy constructor
-            map(const map &x)
+            // Fill in range
+            template < class InputIterator >
+                map(InputIterator first, InputIterator last,
+                const key_compare &comp = key_compare(),
+                const allocator_type &alloc = allocator_type())
+                : _comp(comp), _alloc(alloc)
             {
-                //TODO
+                    //TODO
             }
 
             // Destructor
@@ -81,7 +83,6 @@ namespace ft
 
             mapped_type &operator[](const key_type &k)
             {
-                //TODO
             }
 
             // Observers
@@ -104,6 +105,11 @@ namespace ft
             allocator_type  get_allocator() const { return (this->_alloc);}
 
         private:
+            RBTree<T, Alloc>    _map;
+            key_compare         _comp;
+            size_type           _size;
+            allocator_type      _alloc;
+
     };
 }
 
