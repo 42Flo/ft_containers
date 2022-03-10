@@ -45,7 +45,7 @@ namespace ft
 
 					// Referencing
 					reference	operator*(){ return (*(this->_current));}
-					pointer		operator->(){ return (this->_current);}
+					pointer		operator->(){ return (this->_current);}//TODO test that
 					reference	operator[](int r)
 					{
 						return (*(this->_current + r));
