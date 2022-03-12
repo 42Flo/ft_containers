@@ -70,7 +70,7 @@
     tree.deleteNode(tree[2]);
     tree.display(tree.getRoot(), "", true);*/
     
-    RBTree< ft::pair<const int, int> , std::less<const int> >  tree;
+    RBTree< ft::pair<const int, int> >  tree;
 
     tree.insert(ft::pair<const int, int>(1, 43));
     tree.insert(ft::pair<const int, int>(2, 4));
