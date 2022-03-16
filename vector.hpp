@@ -78,7 +78,7 @@ namespace ft
 					}
 
 					// Arithmetic
-					random_access_iterator	operator+(int r) const
+				    random_access_iterator  operator+(int r) const
 					{
 						return (this->_current + r);
 					}
@@ -157,7 +157,7 @@ namespace ft
 				: _size(0), _capacity(0), _alloc(alloc){}
 
 			// Copy constructor
-			vector(const ft::vector<T, Alloc> &x)
+			vector(const vector &x)
 				: _size(0), _capacity(0), _alloc(x.get_allocator())
 			{
                 this->insert(this->begin(), x.begin(), x.end());
@@ -182,6 +182,8 @@ namespace ft
                 this->insert(this->begin(), first, last);
 			}
 
+            //TODO destructor
+
 			// Assignation operator
 			ft::vector<T, Alloc>	operator=(const ft::vector<T, Alloc> &x)
 			{
@@ -191,11 +193,11 @@ namespace ft
                     this->_capacity = x.capacity();
                     this->_alloc = x.get_allocator();
                     this->_vector = this->_alloc.allocate(this->_capacity);
-                    for (unsigned int i ; i < this->_size ; ++i)
+                    for (unsigned int i = 0 ; i < this->_size ; ++i)//TODO use iterator
                         this->_alloc.construct(&(this->_vector[i]), x[i]);
                 }
 			}
-		
+
             // Iterators
             iterator    begin()
             { 
@@ -205,7 +207,7 @@ namespace ft
             reverse_iterator    rbegin()
             {
                 return (reverse_iterator(&(this->_vector[this->_size])));
-            }
+            }//TODO FIX REVERSE ITERATORS
 
             iterator    end()
             { 
@@ -242,8 +244,7 @@ namespace ft
 
 			size_type	capacity() const { return (this->_capacity);}
 			
-			bool    empty() const { return ((this->_size == 0) ? true : false);
-            }
+			bool    empty() const { return (this->_size == 0);}
 
             void    reserve(size_type n)
             {
@@ -321,7 +322,7 @@ namespace ft
             iterator	erase(iterator position)
             {
                 this->_alloc.destroy(&(*position));
-                this->_shiftLeft(position - this->begin(), 1);
+                this->_shiftLeft(position - this->begin(), 1);//TODO check with iterator NULL
                 --this->_size;
                 return (position);
             }
@@ -331,13 +332,13 @@ namespace ft
                 difference_type n = last - first;
 
                 for ( ; first != last ; ++first)
-                    this->_alloc.destroy(&(*first));
+                    this->_alloc.destroy(&(*first));//TODO same here
                 this->_shiftLeft(last - this->begin() - 1, n);
                 this->_size -= n;
                 return (last);
             }
 
-            void	swap(ft::vector<T, Alloc> &x)
+            void	swap(vector &x)
             {
                 ft::swap(this->_vector, x._vector);
                 ft::swap(this->_size, x._size);
@@ -348,7 +349,7 @@ namespace ft
             void	clear()
             {
                 for (unsigned int i = 0 ; i < this->_size ; ++i)
-                    this->_alloc.destroy(&(this->_vector[i]));
+                    this->_alloc.destroy(&(this->_vector[i]));//TODO use iterator
                 this->_size = 0;
             }
 
@@ -484,6 +485,8 @@ namespace ft
             {
                 return (!(l < r));
             }
+
+            //TODO non-member swap
     };
 }
 

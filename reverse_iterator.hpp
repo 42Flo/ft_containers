@@ -44,7 +44,7 @@ namespace ft
 				{
 					reverse_iterator	tmp(*this);
 
-					++(*this);//TODO some tests here
+					++(*this);
 					return (tmp);
 				}
 				reverse_iterator	&operator--()
@@ -56,7 +56,7 @@ namespace ft
 				{
 					reverse_iterator	tmp(*this);
 
-					--(*this);//TODO same here
+					--(*this);
 					return (tmp);
 				}
 

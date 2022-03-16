@@ -76,12 +76,12 @@ template < class T, class Compare = std::less<T>, class KeyCompare = Compare,
 class RBTree
 {
     public:
-        typedef T       value_type;
-        typedef Compare compare;
+        typedef T           value_type;
+        typedef Compare     compare;
         typedef KeyCompare  key_compare;
-        typedef Alloc   alloc_type;
-        typedef T*      pointer;
-        typedef T&      reference;
+        typedef Alloc       alloc_type;
+        typedef T*          pointer;
+        typedef T&          reference;
 
     private:
         class bidirectional_iterator
@@ -110,7 +110,7 @@ class RBTree
 
                 // Referencing
                 //bidirectional_iterator  operator*(){ return (*(this->_cur));}
-                Node<value_type, Alloc>  *operator*(){ return (this->_cur);}//not sure about that
+                value_type  *operator*(){ return (this->_cur->data);}//not sure about that
 
                 pointer operator->(){ return (&(this->_cur->data));}
 
@@ -120,7 +120,7 @@ class RBTree
                     bidirectional_iterator  parent = this->_cur->parent;
 
                     if (this->_cur->right == NULL && parent != NULL &&
-                            !this->_comp((*this)->first, parent->first))
+                            this->_comp((*this)->first, parent->first))
                         this->_cur = this->_cur->parent;
                     else if (this->_cur->right)
                     {
@@ -144,7 +144,7 @@ class RBTree
                     bidirectional_iterator  parent = this->_cur->parent;
 
                     if (this->_cur->left == NULL && parent != NULL &&
-                            this->_comp((*this)->first, parent->first))//TODO change compare function
+                            !this->_comp((*this)->first, parent->first))//TODO change compare function
                         this->_cur = this->_cur->parent;
                     else if (this->_cur->left)
                     {
@@ -162,6 +162,8 @@ class RBTree
                     --this;
                     return (tmp);
                 }
+                
+                key_compare key_comp() const {return (this->_comp);}
 
             private:
                 Node<value_type, Alloc> *_cur;
@@ -191,31 +193,36 @@ class RBTree
 
         Node<T, Alloc> *getRoot() const {return (this->_root);}
 
-        void    insert(value_type data, iterator hint = NULL)
-        {
+        iterator    insert(value_type &data, iterator hint = NULL)
+        {//TODO return iterator to data inserted, manage hint
             if (this->_root == NULL)
             {
                 this->_root = _createNode(data);
                 this->_root->color = BLACK;
+                return (this->_root);
             }
             else
             {
                 Node<T, Alloc>  *newNode = _createNode(data);
-                Node<T, Alloc>  *tmp = this->_root, *tmp2 = tmp;
+                Node<T, Alloc>  *tmp = (_checkHint() ? hint.getCurrent() : this->_root);
+                Node<T, Alloc>  *tmp2 = tmp;
 
-                while (tmp != NULL)
+                while (hint != NULL)
                 {
                     tmp2 = tmp;
-                    if (key_comp(data, tmp->data))
+                    if (this->_comp(data, *hint))
                         tmp = tmp->left;
                     else
                         tmp = tmp->right;
                 }
-                //tmp2->data < newNode->data ? tmp2->right = newNode : tmp2->left = newNode;
-                key_comp(tmp2->data, newNode->data) ? tmp2->right = newNode : tmp2->left = newNode;
+                if (this->_comp(tmp2->data, newNode->data))
+                    tmp2->right = newNode;
+                else
+                    tmp2->left = newNode;
                 newNode->parent = tmp2;
                 if (newNode->parent->parent != NULL)
                     _insertBalance(newNode);
+                return (newNode);
             }
         }
 
@@ -303,6 +310,29 @@ class RBTree
                     break;
             }
             this->_root->color = BLACK;
+        }
+
+        bool    _checkHint(iterator hint, const value_type &val)
+        {
+            if (hint == NULL)
+                return (false);
+            if (this->_comp(val, this->_root->data))
+            {
+                if (!this->_comp(*hint, this->_root->data) ||
+                        hint.getCurrent()->isRightChild() ||
+                        (hint.getCurrent()->parent != NULL &&
+                        hint.getCurrent()->parent->isRightChild()))
+                    return (false);
+            }
+            else
+            {
+                if (this->_comp(*hint, this->_root->data) ||
+                        hint.getCurrent()->isLeftChild() ||
+                        (hint.getCurrent()->parent != NULL &&
+                        hint.getCurrent()->parent->isLeftChild()))
+                    return (false);
+            }
+            return (true);
         }
 
         void    _fixUncleRed(Node<T, Alloc> *uncle, Node<T, Alloc> **node)

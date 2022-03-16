@@ -18,8 +18,8 @@
 
     int	main()
     {
-        /*
-        ft::vector<int> a;
+        
+        /*ft::vector<int> a;
         ft::vector<int> b(10, 21);
 
         for (unsigned int i = 1 ; i < 6 ; ++i)
@@ -47,7 +47,9 @@
         std::cout << "vector b" << std::endl;
         for (ft::vector<int>::iterator it = b.begin() ; it != b.end() ; ++it)
         std::cout << *it << std::endl;
-*/
+
+        a.swap(b);*/
+
     //RBTree<int, std::less<int> >  tree;
 
     /*tree.insert(10);
@@ -70,19 +72,6 @@
     tree.deleteNode(tree[2]);
     tree.display(tree.getRoot(), "", true);*/
     
-    RBTree< ft::pair<const int, int> >  tree;
-
-    tree.insert(ft::pair<const int, int>(1, 43));
-    tree.insert(ft::pair<const int, int>(2, 4));
-    tree.insert(ft::pair<const int, int>(3, 100));
-    tree.insert(ft::pair<const int, int>(4, 100));
-    tree.insert(ft::pair<const int, int>(5, 76));
-    tree.insert(ft::pair<const int, int>(6, 98));
-    tree.insert(ft::pair<const int, int>(7, 9));
-    tree.insert(ft::pair<const int, int>(8, 2));
-    //tree.insert(ft::pair<const int, int>(9, 20));
-    tree.display(tree.getRoot(), "", true);
-
     return (0);
 }
 
