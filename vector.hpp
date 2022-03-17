@@ -180,7 +180,7 @@ namespace ft
                 : _size(0), _capacity(0), _alloc(alloc)
 			{
                 this->insert(this->begin(), first, last);
-			}
+			}//TODO fix no matching constructor for range constructor
 
             //TODO destructor
 
@@ -232,7 +232,7 @@ namespace ft
 			{
                 if (n < this->_size)
                     for (unsigned int i = n ; i < this->_size ; ++i)
-                        this->_alloc.destroy(this->_vector[i]);
+                        this->_alloc.destroy(&(this->_vector[i]));
                 else
                 {
                     if (this->_capacity < n)
@@ -302,7 +302,7 @@ namespace ft
                     this->_alloc.construct(&(this->_vector[pos++]), val);
                 this->_size += n;
             }
-            // insert(): fill in range
+            // insert(): in range
             template < class InputIterator >
             void	insert(iterator position, InputIterator first, InputIterator last,
                 typename ft::enable_if<!ft::is_integral<InputIterator>::value,
@@ -317,6 +317,21 @@ namespace ft
                     this->_alloc.construct(&(this->_vector[pos++]), *first);
                     ++this->_size;
                 }
+            }
+
+            // assign(): in range
+            template < class InputIterator >
+            void    assign(InputIterator first, InputIterator last)
+            {
+                this->clear();
+                this->insert(this->begin(), first, last);
+            }
+
+            // assign(): fill
+            void    assign(size_type n, const value_type &val)
+            {
+                this->clear();
+                this->insert(this->begin(), n, val);
             }
 
             // erase(): single element

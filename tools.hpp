@@ -54,8 +54,8 @@ namespace ft
         friend bool operator<(const ft::pair<T1, T2> &l,
                 const ft::pair<T1, T2> &r)
         {
-            return (l.first < r.first || (!(r.first < l.first) &&
-                        l.second < r.second));
+            return (l.first < r.first || //TODO do some tests
+                    (!(r.first < l.first) && l.second < r.second));
         }
         friend bool operator<=(const ft::pair<T1, T2> &l,
                 const ft::pair<T1, T2> &r)
