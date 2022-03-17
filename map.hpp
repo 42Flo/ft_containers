@@ -5,6 +5,7 @@
 # include <memory>
 
 # include "type_traits.hpp"
+# include "reverse_iterator.hpp"
 # include "rb_tree.hpp"
 # include "tools.hpp"
 
@@ -45,7 +46,8 @@ namespace ft
             };
 
             typedef typename RBTree<value_type, Compare, value_compare, Alloc>::
-                bidirectional_iterator    iterator;
+                bidirectional_iterator  iterator;
+            typedef ft::reverse_iterator<iterator>  reverse_iterator;
 
             // Default
             explicit map(const key_compare &comp = key_compare(),
@@ -63,13 +65,13 @@ namespace ft
 
             // Fill in range
             template < class InputIterator >
-                map(InputIterator first, InputIterator last,
-                        const key_compare &comp = key_compare(),
-                        const allocator_type &alloc = allocator_type())
+            map(InputIterator first, InputIterator last,
+                const key_compare &comp = key_compare(),
+                const allocator_type &alloc = allocator_type())
                 : _comp(comp), _alloc(alloc)
-                {
-                    //TODO
-                }
+            {
+                //TODO
+            }
 
             // Destructor
             ~map()
@@ -89,32 +91,65 @@ namespace ft
 
             // Element access
 
-            /*mapped_type &operator[](const key_type &k)
-              {
-              }*/
+            mapped_type &operator[](const key_type &k)
+            {
+                //return (*((this->insert(ft::make_pair(k, mapped_type()))).first).second);
+                return (this->insert(ft::make_pair(k, mapped_type()))->second);
+            }
 
             // Modifiers
             // insert(): single element
             ft::pair<iterator, bool>    insert(const value_type &val)
             {
+                iterator    it = this->find(val->first);
+
+                if (it != this->end())
+                    return (ft::make_pair(it, false));
+                ++this->_size;
+                this->_tree.insert(val);
             }
 
-            // insert(); with hint
+            // insert(): with hint
             iterator    insert(iterator position, const value_type &val)
             {
-
+                if (iterator it = find(val->first) != end())
+                    return (it);
+                ++this->_size;
+                return (this->_tree.insert(val, position));
             }
 
             // insert(): in range
             template < class InputIterator >
-                void    insert(InputIterator first, InputIterator last)
-                {
+            void    insert(InputIterator first, InputIterator last,
+                    typename ft::enable_if<!ft::is_integral<InputIterator>::value,
+                    InputIterator>::type = 0)
+            {
+                for ( ; first != last ; ++first)
+                    this->insert(*first);
+            }
 
-                }
+            // erase(): with iterator
+            void    erase(iterator position)
+            {
+                this->_tree.deleteNode(position.getCurrent());
+            }
+
+            // erase(): with key
+            size_type   erase(const key_type &k)
+            {
+                this->_tree.deleteNode(*(this->find(k)));
+                return (1);
+            }
+
+            // erase(): in range
+            void    erase(iterator first, iterator last)
+            {
+                for ( ; first != last ; ++first)
+                    this->_tree.deleteNode(first.getCurrent());
+            }
 
             // Observers
             key_compare key_comp() const {return (this->_comp);}
-
 
             value_compare   value_comp() const {return (value_compare(this->_comp));}
 
@@ -135,6 +170,16 @@ namespace ft
                 while (node->right != NULL && value_comp()(node->data, node->right->data))
                     node = node->right;
                 return (iterator(node));
+            }
+
+            reverse_iterator    rbegin()
+            {
+                return (reverse_iterator(this->end()));
+            }
+
+            reverse_iterator    rend()
+            {
+                return (reverse_iterator(this->begin()));
             }
 
             // Allocator
@@ -189,8 +234,7 @@ namespace ft
 
             ft::pair<iterator, iterator>    equal_range(const key_type &k)
             {
-                return (ft::pair<iterator, iterator>
-                        (lower_bound(k), upper_bound(k)));
+                return (ft::make_pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
             }
 
             //TODO equal_range with const iterator

@@ -31,13 +31,15 @@ namespace ft
 				pointer	operator->(){ return(this->_base.getCurrent());}
 				reference	operator[](int r)
 				{
-					return (*(this->_base.getCurrent() + r));
+                    return (this->_base + r);
+					//return (*(this->_base.getCurrent() + r));
 				}
 
 				// Increment / Decrease
 				reverse_iterator	&operator++()
 				{
-					--(this->_base.getCurrent());
+                    --this->base;
+					//--(this->_base.getCurrent());
 					return (*this);
 				}
 				reverse_iterator	operator++(int)
@@ -49,7 +51,8 @@ namespace ft
 				}
 				reverse_iterator	&operator--()
 				{
-					++(this->_base.getCurrent());
+                    ++this->base;
+					//++(this->_base.getCurrent());
 					return (*this);
 				}
 				reverse_iterator	operator--(int)
@@ -63,24 +66,28 @@ namespace ft
 				// Arithmetic
 				reverse_iterator	operator+(difference_type n) const
 				{
-					return (this->_base.GetCurrent() - n);
+                    return (this->_base - n);
+					//return (this->_base.GetCurrent() - n);
 				}
 
 				reverse_iterator	operator-(difference_type n) const
 				{
-					return (this->_base.GetCurrent() + n);
+                    return (this->_base + n);
+					//return (this->_base.GetCurrent() + n);
 				}
 
 				//Compound assignment
 				reverse_iterator	operator+=(difference_type n) const
 				{
-					this->_base.getCurrent() -= n;
+					//this->_base.getCurrent() -= n;
+					this->_base -= n;
 					return (*this);
 				}
 
 				reverse_iterator	operator-=(difference_type n) const
 				{
-					this->_base.getCurrent()  += n;
+					//this->_base.getCurrent()  += n;
+					this->_base += n;
 					return (*this);
 				}
 
@@ -93,32 +100,37 @@ namespace ft
 				friend bool operator==(const reverse_iterator &l,
 						const reverse_iterator &r)
 				{
-					return (l.base().getCurrent() == r.base().getCurrent());
+					//return (l.base().getCurrent() == r.base().getCurrent());
+					return (l.base == r.base);
 				}
 				friend bool	operator!=(const reverse_iterator &l,
 						const reverse_iterator &r)
 				{
-					return (l.base().getCurrent() != r.base().getCurrent());
+					//return (l.base().getCurrent() != r.base().getCurrent());
+					return (l.base != r.base);
 				}
 				friend bool	operator<(const reverse_iterator &l,
 						const reverse_iterator &r)
 				{
-					return (l.base().getCurrent() < r.base().getCurrent());
+					//return (l.base().getCurrent() < r.base().getCurrent());
+					return (l.base < r.base);
 				}
 				friend bool	operator<=(const reverse_iterator &l,
 						const reverse_iterator &r)
 				{
-					return (l.base().getCurrent() <= r.base().getCurrent());
+					//return (l.base().getCurrent() <= r.base().getCurrent());
+					return (l.base <= r.base);
 				}
 				friend bool	operator>(const reverse_iterator<Iterator> &l,
 						const reverse_iterator<Iterator> &r)
 				{
-					return (l.base().getCurrent() > r.base().getCurrent());
+					//return (l.base().getCurrent() > r.base().getCurrent());
+					return (l.base > r.base);
 				}
 				friend bool	operator>=(const reverse_iterator<Iterator> &l,
 						const reverse_iterator<Iterator> &r)
 				{
-					return (l.base().getCurrent() >= r.base().getCurrent());
+					return (l.base >= r.base);
 				}
 
 				//TODO operator+ operator-

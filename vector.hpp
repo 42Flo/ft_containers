@@ -206,8 +206,9 @@ namespace ft
 
             reverse_iterator    rbegin()
             {
-                return (reverse_iterator(&(this->_vector[this->_size])));
-            }//TODO FIX REVERSE ITERATORS
+                //return (reverse_iterator(&(this->_vector[this->_size])));
+                return (reverse_iterator(this->end()));
+            }
 
             iterator    end()
             { 

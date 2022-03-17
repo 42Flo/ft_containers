@@ -146,6 +146,8 @@ namespace ft
                 return (false);
             else if (comp(*first1, *first2) == true)
                 return (true);
+            ++first1;
+            ++first2;
         }
         return (first2 != last2);
     }

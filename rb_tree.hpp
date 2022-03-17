@@ -104,7 +104,7 @@ class RBTree
                     return (*this);
                 }
 
-                Node<value_type, Alloc> *getCurrent() const{ return (this->_cur);}
+                Node<value_type, Alloc> *getNode() const{ return (this->_cur);}
 
                 compare comp() const{ return (this->_comp);}
 
