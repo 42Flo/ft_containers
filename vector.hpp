@@ -502,7 +502,10 @@ namespace ft
                 return (!(l < r));
             }
 
-            //TODO non-member swap
+            friend void swap(vector<T, Alloc> &x, vector<T, Alloc> &y)
+            {
+                x.swap(y);
+            }
     };
 }
 
