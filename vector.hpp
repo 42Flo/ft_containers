@@ -305,13 +305,12 @@ namespace ft
             // insert(): in range
             template < class InputIterator >
             void	insert(iterator position, InputIterator first, InputIterator last,
-                typename ft::enable_if<!ft::is_integral<InputIterator>::value,
-                InputIterator>::type = 0)
+                typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
             {
                 difference_type pos = position - this->begin();
 
                 this->reserve(this->_size + (last - first));
-                this->_shitftRight(pos, last - first);
+                this->_shiftRight(pos, last - first);
                 for ( ; first != last ; ++first)
                 {
                     this->_alloc.construct(&(this->_vector[pos++]), *first);
@@ -431,7 +430,7 @@ namespace ft
                     for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
                     {
                         this->_alloc.construct(&(*toWrite--), *toDelete);
-                        *toDelete = 0; //maybe not needed
+                        //*toDelete = 0;
                         this->_alloc.destroy(&(*toDelete--));
                     }
                 }
@@ -447,7 +446,7 @@ namespace ft
                     for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
                     {
                         this->_alloc.construct(&(*toWrite++), *toDelete);
-                        *toDelete = 0; //same
+                        //*toDelete = 0;
                         this->_alloc.destroy(&(*toDelete++));
                     }
                 }

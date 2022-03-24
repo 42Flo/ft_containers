@@ -15,59 +15,47 @@ namespace ft
         typedef T type;
     };
 
-    // integral_constant:   provide types for is_integral
-
-    template < class T, T v >
-    struct integral_constant
-    {
-        typedef T   value_type;
-        typedef integral_constant<T, v> type;
-    };
-
     // is_integral:         set integral_constant::type to true if overloaded
     //                      by an integral type, otherwise type is false
 
-    template < class T >
-    struct is_integral : public integral_constant<bool, false>{};
+    template < class T, class = void>
+    struct is_integral { const static bool value = false;};
 
     template <>
-    struct is_integral<bool> : public integral_constant<bool, true>{};
+    struct is_integral<bool> { const static bool value = true;};
 
     template <>
-    struct is_integral<char> : public integral_constant<bool, true>{};
+    struct is_integral<char> { const static bool value = true;};
 
     template <>
-    struct is_integral<wchar_t> : public integral_constant<bool, true>{};
+    struct is_integral<wchar_t> { const static bool value = true;};
 
     template <>
-    struct is_integral<signed char> : public integral_constant<bool, true>{};
+    struct is_integral<short> { const static bool value = true;};
 
     template <>
-    struct is_integral<short> : public integral_constant<bool, true>{};
+    struct is_integral<int> { const static bool value = true;};
 
     template <>
-    struct is_integral<int> : public integral_constant<bool, true>{};
+    struct is_integral<long> { const static bool value = true;};
 
     template <>
-    struct is_integral<long> : public integral_constant<bool, true>{};
+    struct is_integral<long long> { const static bool value = true;};
 
     template <>
-    struct is_integral<long long> : public integral_constant<bool, true>{};
+    struct is_integral<unsigned char> { const static bool value = true;};
 
     template <>
-    struct is_integral<unsigned char> : public integral_constant<bool, true>{};
+    struct is_integral<unsigned short> { const static bool value = true;};
 
     template <>
-    struct is_integral<unsigned short> : public integral_constant<bool, true>{};
+    struct is_integral<unsigned int> { const static bool value = true;};
 
     template <>
-    struct is_integral<unsigned int> : public integral_constant<bool, true>{};
+    struct is_integral<unsigned long> { const static bool value = true;};
 
     template <>
-    struct is_integral<unsigned long> : public integral_constant<bool, true>{};
-
-    template <>
-    struct is_integral<unsigned long long> : public integral_constant<bool, true>{};
+    struct is_integral<unsigned long long> { const static bool value = true;};
 }
 
 #endif // UTILS_HPP

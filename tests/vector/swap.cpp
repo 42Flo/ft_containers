@@ -13,7 +13,7 @@ int main()
     printVector(vec);
     printVector(vec2);
 
-    // Check iterator validity
+    // Checking iterator validity
     std::cout << (it == vec.begin()) << std::endl;
     std::cout << (it2 == vec2.begin()) << std::endl;
 

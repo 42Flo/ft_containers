@@ -1,23 +1,17 @@
 #ifndef HELPER_HPP
 # define HELPER_HPP
 
-# include <stdlib.h>
-# include <time.h>
-
-# include "../test.hpp"
-
-# if NS_TARGET == std
+# ifdef STL
+    #define NS_TARGET std
     #include <vector>
 # else
+    #define NS_TARGET ft
     #include "vector.hpp"
 # endif
 
 # ifndef TYPE
     #define TYPE int
 # endif
-
-# define MIN_RAND -100
-# define MAX_RAND 100
 
 template <class T>
 void    printSize(NS_TARGET::vector<T> &vec)//TODO same

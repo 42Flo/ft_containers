@@ -3,11 +3,10 @@
 int main()
 {
     NS_TARGET::vector<int> vec;
-    srand(time(NULL));
 
-    // Assign values using at()
+    // Assigning values using at()
     for (unsigned int i = 0 ; i < vec.size() ; ++i)
-        vec.at(i) = rand() % MAX_RAND + MIN_RAND;
+        vec.at(i) = i;
 
     NS_TARGET::vector<int>::iterator   it = vec.begin();
     NS_TARGET::vector<int>::iterator   ite = vec.end();

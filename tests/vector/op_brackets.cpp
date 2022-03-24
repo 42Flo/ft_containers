@@ -4,11 +4,11 @@ int main()
 {
     NS_TARGET::vector<int> vec(10);
     unsigned int        size = vec.size();
-    srand(time(NULL));
+    int value = 1;
 
-    // Assign random values using operator[]
+    // Assigning values using operator[]
     for (unsigned int i = 0 ; i < size ; ++i)
-        vec[i] = rand() % MAX_RAND + MIN_RAND;
+        vec[i] = value++;
     printVector(vec);
 
     // Reverse values
