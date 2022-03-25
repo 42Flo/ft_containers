@@ -13,9 +13,13 @@ int main()
 
     strVec.insert(strVec.end(), 2, "bar");
     printVector(strVec);
+    strVec.insert(strVec.end(), 3, "foo");
     
     for (unsigned int i = 0 ; i < 10 ; ++i)
+    {
         intVec.insert(intVec.begin(), value += 2);
+        printSize(intVec);
+    }
     printVector(intVec);
     intVec2.insert(intVec2.begin(), intVec.begin(), intVec.end());
     printVector(intVec2);

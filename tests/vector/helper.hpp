@@ -1,6 +1,8 @@
 #ifndef HELPER_HPP
 # define HELPER_HPP
 
+# include <iostream>
+
 # ifdef STL
     #define NS_TARGET std
     #include <vector>

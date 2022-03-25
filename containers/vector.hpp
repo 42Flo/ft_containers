@@ -5,9 +5,9 @@
 # include <stdexcept>
 # include <cstddef>
 
-# include "reverse_iterator.hpp"
-# include "type_traits.hpp"
-# include "tools.hpp"
+# include "../tools/reverse_iterator.hpp"
+# include "../tools/type_traits.hpp"
+# include "../tools/tools.hpp"
 
 namespace ft
 {
@@ -176,7 +176,7 @@ namespace ft
 			vector(InputIterator first, InputIterator last,
                 const allocator_type &alloc = allocator_type(),
                 typename ft::enable_if<!ft::is_integral<InputIterator>::value,
-                InputIterator>::type = 0)
+                InputIterator>::type * = 0)
                 : _size(0), _capacity(0), _alloc(alloc)
 			{
                 this->insert(this->begin(), first, last);
@@ -270,6 +270,7 @@ namespace ft
                     this->_capacity = n;
                 }
             }
+            //TODO fix capacity to be incremented has capacity *= 2
 
             // Modifiers
             void	push_back(const value_type &val)
