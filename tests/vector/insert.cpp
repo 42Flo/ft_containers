@@ -11,9 +11,11 @@ int main()
     vec.insert(vec.begin(), TYPE());
     printVector(vec);
 
+    printVector(strVec);
     strVec.insert(strVec.end(), 2, "bar");
     printVector(strVec);
     strVec.insert(strVec.end(), 3, "foo");
+    printVector(strVec);
     
     for (unsigned int i = 0 ; i < 10 ; ++i)
     {

@@ -15,9 +15,9 @@ int main()
     printVector(vec);
     intVec.erase(intVec.begin());
     printVector(vec);
-    intVec.erase(intVec.end());
+    intVec.erase(intVec.end() - 1);
     printVector(vec);
-    intVec.erase(intVec.end());
+    intVec.erase(intVec.end() - 1);
     printVector(vec);
 
     intVec.erase(intVec.begin() + 1);

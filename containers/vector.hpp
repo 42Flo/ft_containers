@@ -5,140 +5,16 @@
 # include <stdexcept>
 # include <cstddef>
 
-# include "../tools/reverse_iterator.hpp"
+# include "../iterators/reverse_iterator.hpp"
 # include "../tools/type_traits.hpp"
 # include "../tools/tools.hpp"
+# include "../iterators/random_access_iterator.hpp"
 
 namespace ft
 {
     template < class T, class Alloc = std::allocator<T> >
 	class vector
 	{
-		private:
-			class random_access_iterator
-			{
-				public:
-					typedef T	            value_type;
-					typedef std::ptrdiff_t	difference_type;
-					typedef T&	            reference;
-					typedef T*	            pointer;
-
-                    // Default constructor
-					random_access_iterator(pointer val = 0) : _current(val){}
-
-                    // Copy constructor
-					random_access_iterator(random_access_iterator const &src)
-						: _current(src.getCurrent()){}
-
-                    // Destructor
-					~random_access_iterator(){}
-
-					pointer	getCurrent() const {return (this->_current);}
-
-					// Assignation
-					random_access_iterator	operator=(random_access_iterator &r)
-					{
-						if (this != &r)
-							this->_current = r.getCurrent();
-						return (*this);
-					}
-
-					// Referencing
-					reference	operator*(){ return (*(this->_current));}
-					pointer		operator->(){ return (this->_current);}//TODO test that
-					reference	operator[](int r)
-					{
-						return (*(this->_current + r));
-					}
-
-					// Increment / Decrease
-					random_access_iterator	&operator++()
-					{
-						++(this->_current);
-						return (*this);
-					}
-					random_access_iterator	operator++(int)
-					{
-						random_access_iterator	tmp(*this);
-
-						++(this->_current);
-						return (tmp);
-					}
-					random_access_iterator	&operator--()
-					{
-						--(this->_current);
-						return (*this);
-					}
-					random_access_iterator	operator--(int)
-					{
-						random_access_iterator	tmp(*this);
-
-						--(this->_current);
-						return (tmp);
-					}
-
-					// Arithmetic
-				    random_access_iterator  operator+(int r) const
-					{
-						return (this->_current + r);
-					}
-					random_access_iterator	operator-(int r) const
-					{
-						return (this->_current - r);
-					}
-					difference_type operator-(random_access_iterator const &r)
-					{
-                        return (this->_current - r.getCurrent());
-					}
-
-					// Compound assignment
-					random_access_iterator	operator+=(int r)
-					{
-						this->_current += r;
-						return (*this);
-					}
-					random_access_iterator	operator-=(int r)
-					{
-						this->_current -= r;
-						return (*this);
-					}
-
-				private:
-					pointer	_current;
-
-					// Relational operators
-					friend bool	operator==(const random_access_iterator &l,
-							const random_access_iterator &r)
-					{
-						return (l.getCurrent() == r.getCurrent());
-					}
-					friend bool	operator!=(const random_access_iterator &l,
-							const random_access_iterator &r)
-					{
-						return (l.getCurrent() != r.getCurrent());
-					}
-					friend bool	operator<(const random_access_iterator &l,
-							const random_access_iterator &r)
-					{
-						return (l.getCurrent() < r.getCurrent());
-					}
-					friend bool	operator<=(const random_access_iterator &l,
-							const random_access_iterator &r)
-					{
-						return (l.getCurrent() <= r.getCurrent());
-					}
-					friend bool	operator>(const random_access_iterator &l,
-							const random_access_iterator &r)
-					{
-						return (l.getCurrent() > r.getCurrent());
-					}
-					friend bool	operator>=(const random_access_iterator &l,
-							const random_access_iterator &r)
-					{
-						return (l.getCurrent() >= r.getCurrent());
-					}
-			};
-
 		public:
 			typedef T	                                        value_type;
 			typedef Alloc	                                    allocator_type;
@@ -146,9 +22,9 @@ namespace ft
 			typedef typename allocator_type::const_reference    const_reference;
 			typedef typename allocator_type::pointer	        pointer;
 			typedef typename allocator_type::const_pointer	    const_pointer;
-			typedef random_access_iterator	                    iterator;
+			typedef ft::random_access_iterator<T>	            iterator;
+            typedef ft::random_access_iterator<const T>         const_iterator;
             typedef ft::reverse_iterator<iterator>              reverse_iterator;
-            //TODO const iterators
 			typedef size_t                                      size_type;
             typedef ptrdiff_t                                   difference_type;
 
@@ -180,7 +56,7 @@ namespace ft
                 : _size(0), _capacity(0), _alloc(alloc)
 			{
                 this->insert(this->begin(), first, last);
-			}//TODO fix no matching constructor for range constructor
+			}
 
             //TODO destructor
 
@@ -196,12 +72,18 @@ namespace ft
                     for (unsigned int i = 0 ; i < this->_size ; ++i)//TODO use iterator
                         this->_alloc.construct(&(this->_vector[i]), x[i]);
                 }
+                return (*this);
 			}
 
             // Iterators
             iterator    begin()
             { 
                 return (iterator(&(this->_vector[0])));
+            }
+
+            const_iterator  begin() const
+            {
+                return (const_iterator(&(this->_vector[0])));
             }
 
             reverse_iterator    rbegin()
@@ -213,6 +95,11 @@ namespace ft
             iterator    end()
             { 
                 return (iterator(&(this->_vector[this->_size])));
+            }
+
+            const_iterator  end() const
+            {
+                return (const_iterator(&(this->_vector[this->_size])));
             }
 
             reverse_iterator    rend()
@@ -270,6 +157,39 @@ namespace ft
                     this->_capacity = n;
                 }
             }
+
+/*            void    reserve(size_type n)
+            {
+                if (n > this->max_size())
+                    throw (std::length_error("reserve: length too high"));
+                if (n <= this->_capacity)
+                    return;
+                if (this->_capacity == 0)
+                {
+                    this->_vector = this->_alloc.allocate(n);
+                    this->_capacity = n;
+                }
+                else
+                {
+                    size_type   newCapacity = this->_capacity;
+
+                    while (newCapacity < n)
+                        newCapacity *= 2;
+
+                    pointer newVec = this->_alloc.allocate(newCapacity);
+
+                    for (unsigned int i = 0 ; i < this->_size ; ++i)
+                    {
+                        this->_alloc.construct(&newVec[i], this->_vector[i]);
+                        this->_alloc.destroy(&(this->_vector[i]));
+                    }
+                    this->_alloc.deallocate(this->_vector, this->_capacity);
+                    this->_vector = newVec;
+                    this->_capacity = newCapacity;
+                }
+            }
+*/
+
             //TODO fix capacity to be incremented has capacity *= 2
 
             // Modifiers
@@ -305,27 +225,27 @@ namespace ft
             }
             // insert(): in range
             template < class InputIterator >
-            void	insert(iterator position, InputIterator first, InputIterator last,
-                typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
-            {
-                difference_type pos = position - this->begin();
-
-                this->reserve(this->_size + (last - first));
-                this->_shiftRight(pos, last - first);
-                for ( ; first != last ; ++first)
+                void	insert(iterator position, InputIterator first, InputIterator last,
+                        typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
                 {
-                    this->_alloc.construct(&(this->_vector[pos++]), *first);
-                    ++this->_size;
+                    difference_type pos = position - this->begin();
+
+                    this->reserve(this->_size + (last - first));
+                    this->_shiftRight(pos, last - first);
+                    for ( ; first != last ; ++first)
+                    {
+                        this->_alloc.construct(&(this->_vector[pos++]), *first);
+                        ++this->_size;
+                    }
                 }
-            }
 
             // assign(): in range
             template < class InputIterator >
-            void    assign(InputIterator first, InputIterator last)
-            {
-                this->clear();
-                this->insert(this->begin(), first, last);
-            }
+                void    assign(InputIterator first, InputIterator last)
+                {
+                    this->clear();
+                    this->insert(this->begin(), first, last);
+                }
 
             // assign(): fill
             void    assign(size_type n, const value_type &val)
@@ -418,7 +338,7 @@ namespace ft
             }
 
             allocator_type	get_allocator() const {return (this->_alloc);}
-            
+
         private:
 
             void    _shiftRight(difference_type pos, size_type n)
@@ -460,7 +380,7 @@ namespace ft
 
             // Relational operators
             friend bool operator==(const vector<T, Alloc> &l,
-                const vector<T, Alloc> &r)
+                    const vector<T, Alloc> &r)
             {
                 if (l.size() == r.size())
                 {
@@ -473,31 +393,31 @@ namespace ft
             }
 
             friend bool operator!=(const vector<T, Alloc> &l,
-                const vector<T, Alloc> &r)
+                    const vector<T, Alloc> &r)
             {
                 return (!(l == r));
             }
 
             friend bool operator<(const vector<T, Alloc> &l,
-                const vector<T, Alloc> &r)
+                    const vector<T, Alloc> &r)
             {
                 return (lexicographical_compare(l.begin(), l.end(), r.begin(), r.end()));
             }
 
             friend bool operator<=(const vector<T, Alloc> &l,
-                const vector<T, Alloc> &r)
+                    const vector<T, Alloc> &r)
             {
                 return (!(r < l));
             }
 
             friend bool operator>(const vector<T, Alloc> &l,
-                const vector<T, Alloc> &r)
+                    const vector<T, Alloc> &r)
             {
                 return (r < l);
             }
 
             friend bool operator>=(const vector<T, Alloc> &l,
-                const vector<T, Alloc> &r)
+                    const vector<T, Alloc> &r)
             {
                 return (!(l < r));
             }

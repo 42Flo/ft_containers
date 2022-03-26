@@ -21,15 +21,15 @@ namespace ft
 
             size_type   size() const{ return (this->_ctnr.size());}
 
-            value_type  &top() { return (this->ctnr.back());}
-            const value_type    &top() const { return (this->ctnr.back());}
+            value_type  &top() { return (this->_ctnr.back());}
+            const value_type    &top() const { return (this->_ctnr.back());}
 
-            void    push(const value_type &val) { this->ctnr.push_back(val);}
+            void    push(const value_type &val) { this->_ctnr.push_back(val);}
 
-            void    pop() { this->ctnr.pop_back();}
+            void    pop() { this->_ctnr.pop_back();}
 
         private:
-            const container_type    _ctnr;
+            container_type    _ctnr;
 
             friend bool operator==(const stack<T, Container> &l,
                     const stack<T, Container> &r)
