@@ -401,7 +401,7 @@ namespace ft
             friend bool operator<(const vector<T, Alloc> &l,
                     const vector<T, Alloc> &r)
             {
-                return (lexicographical_compare(l.begin(), l.end(), r.begin(), r.end()));
+                return (ft::lexicographical_compare(l.begin(), l.end(), r.begin(), r.end()));
             }
 
             friend bool operator<=(const vector<T, Alloc> &l,

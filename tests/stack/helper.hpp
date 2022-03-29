@@ -15,8 +15,8 @@
     #define TYPE int
 # endif
 
-template < class T, class Container = ft::vector<T> >
-void    printSize(NS_TARGET::stack<T, Container> &st)
+template < class T >
+void    printSize(T &st)
 {
     std::cout << "size: " << st.size() << std::endl;
 }

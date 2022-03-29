@@ -2,8 +2,8 @@
 #include <deque>
 #include "helper.hpp"
 
-template < class T, class Container = ft::vector<T> >
-void    push_pop_top(NS_TARGET::stack<T, Container> &st)
+template < class T >
+void    push_pop_top(T &st)
 {
     for (unsigned int i = 0 ; i < 10 ; ++i)
     {
@@ -34,5 +34,20 @@ int main()
     push_pop_top(intSt);
     push_pop_top(intSt2);
 
-    //TODO tests for relationnal operators
+    NS_TARGET::stack<std::string>   strSt;
+    NS_TARGET::stack<std::string>   strSt2;
+
+    strSt.push("foo");
+    strSt2.push("foo");
+
+    std::cout << (strSt == strSt2) << std::endl;
+    std::cout << (strSt != strSt2) << std::endl;
+
+    strSt2.push("bar");
+
+    std::cout << (strSt == strSt2) << std::endl;
+    std::cout << (strSt != strSt2) << std::endl;
+    std::cout << (strSt < strSt2) << std::endl;
+    std::cout << (strSt <= strSt2) << std::endl;
+    std::cout << (strSt >= strSt2) << std::endl;
 }

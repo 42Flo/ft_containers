@@ -4,10 +4,10 @@
 # include <iostream>
 # include <memory>
 
-# include "type_traits.hpp"
-# include "reverse_iterator.hpp"
-# include "rb_tree.hpp"
-# include "tools.hpp"
+# include "../tools/type_traits.hpp"
+# include "../tools/rb_tree.hpp"
+# include "../tools/tools.hpp"
+# include "../iterators/reverse_iterator.hpp"
 
 namespace ft
 {
@@ -45,8 +45,7 @@ namespace ft
                     }
             };
 
-            typedef typename RBTree<value_type, Compare, value_compare, Alloc>::
-                bidirectional_iterator  iterator;
+            typedef typename RBTree<value_type, Compare, value_compare, Alloc>::iterator  iterator;
             typedef ft::reverse_iterator<iterator>  reverse_iterator;
 
             // Default

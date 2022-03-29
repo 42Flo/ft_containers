@@ -28,38 +28,39 @@ namespace ft
 
             void    pop() { this->_ctnr.pop_back();}
 
-        private:
+        protected:
             container_type    _ctnr;
 
+        private:
             friend bool operator==(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
-                return (l == r);
+                return (l._ctnr == r._ctnr);
             }
             friend bool operator!=(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
-                return (l != r);
+                return (l._ctnr != r._ctnr);
             }
             friend bool operator<(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
-                return (l < r);
+                return (l._ctnr < r._ctnr);
             }
             friend bool operator<=(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
-                return (l <= r);
+                return (l._ctnr <= r._ctnr);
             }
             friend bool operator>(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
-                return (l > r);
+                return (l._ctnr > r._ctnr);
             }
             friend bool operator>=(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
-                return (l >= r);
+                return (l._ctnr >= r._ctnr);
             }
     };
 }
