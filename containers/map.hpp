@@ -8,6 +8,7 @@
 # include "../tools/rb_tree.hpp"
 # include "../tools/tools.hpp"
 # include "../iterators/reverse_iterator.hpp"
+# include "../iterators/bidirectional_iterator.hpp"
 
 namespace ft
 {
@@ -16,23 +17,23 @@ namespace ft
     class map
     {
         public:
-            typedef Key                                         key_type;
-            typedef T                                           mapped_type;
-            typedef ft::pair<const key_type, mapped_type>       value_type;
-            typedef Compare                                     key_compare;
-            typedef Alloc                                       allocator_type;
-            typedef typename allocator_type::reference          reference;
+            typedef Key key_type;
+            typedef T   mapped_type;
+            typedef ft::pair<const key_type, mapped_type>   value_type;
+            typedef Compare key_compare;
+            typedef Alloc   allocator_type;
+            typedef typename allocator_type::reference  reference;
             typedef typename allocator_type::const_reference    const_reference;
-            typedef typename allocator_type::pointer            pointer;
-            typedef typename allocator_type::const_pointer      const_pointer;
-            typedef size_t                                      size_type;
-            typedef ptrdiff_t                                   difference_type;
-
-            //TODO const iterators
+            typedef typename allocator_type::pointer    pointer;
+            typedef typename allocator_type::const_pointer  const_pointer;
+            typedef size_t  size_type;
+            typedef ptrdiff_t   difference_type;
 
             class value_compare : public std::binary_function<value_type, value_type, bool>
             {
                 friend class map;
+                friend class RBTree<value_type, value_compare, Alloc>;
+                friend class bidirectional_iterator<value_type, value_compare, Alloc>;
 
                 protected:
                     Compare comp;
@@ -41,19 +42,20 @@ namespace ft
                 public:
                     bool    operator()(const value_type &x, const value_type &y) const
                     {
-                        return (x.first, y.first);
+                        return (comp(x.first, y.first));
                     }
             };
 
-            typedef typename RBTree<value_type, Compare, value_compare, Alloc>::iterator  iterator;
+            typedef typename RBTree<value_type, value_compare, Alloc>::iterator  iterator;
+            typedef typename RBTree<value_type, value_compare, Alloc>::const_iterator  const_iterator;
             typedef ft::reverse_iterator<iterator>  reverse_iterator;
 
             // Default
             explicit map(const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type())
-                : _comp(comp), _alloc(alloc), _tree(value_comp())
+                : _comp(comp), _alloc(alloc)
             {
-                //TODO
+                this->_tree(this->value_comp());
             }
 
             // Copy
@@ -78,14 +80,14 @@ namespace ft
                 //TODO
             }
 
-            // Capacity / size
-            size_type   size() const { return (this->_size);}
+            // Size / Capacity
+            size_type   size() const {return (this->_size);}
 
-            bool    empty() const { return ((this->_size == 0) ? true : false);}
+            bool    empty() const {return (this->_size == 0);}
 
             size_type   max_size() const
             {
-                return (this->_alloc.max_size);//test that
+                return (this->_alloc.max_size);
             }
 
             // Element access
@@ -159,7 +161,7 @@ namespace ft
 
                 while (node->left != NULL && !value_comp()(node->data, node->left->data))
                     node = node->left;
-                return (iterator(node));
+                return (iterator(node, value_comp()));
             }
 
             iterator    end()
@@ -168,7 +170,7 @@ namespace ft
 
                 while (node->right != NULL && value_comp()(node->data, node->right->data))
                     node = node->right;
-                return (iterator(node));
+                return (iterator(node, value_comp()));
             }
 
             reverse_iterator    rbegin()
@@ -195,23 +197,41 @@ namespace ft
                     if (!this->_comp(it->first, k) && !this->_comp(k, it->first))
                         return (it);
                     else if (this->_comp(it->first, k))
-                        *it = (*it)->right;
+                        ++it;
+                        //*it = (*it)->right;
                     else
-                        *it = (*it)->left;
+                        --it;
+                        //*it = (*it)->left;
                 }
                 return (this->end());
             }
 
-            //TODO find with const iterator
+            const_iterator  find(const key_type &k) const
+            {
+                const_iterator  it(this->_tree.getRoot());
 
-            size_type       count(const key_type &k) const
+                while (it != NULL)
+                {
+                    if (!this->_comp(it->first, k) && !this->_comp(k, it->first))
+                        return (it);
+                    else if (this->_comp(it->first, k))
+                        ++it;
+                        //*it = (*it)->right;
+                    else
+                        --it;
+                        //*it = (*it)->left;
+                }
+                return (this->end());
+            }
+
+            size_type   count(const key_type &k) const
             {
                 if (this->find(k) != this->end())
                     return (1);
                 return (0);
             }
 
-            iterator        lower_bound(const key_type &k)
+            iterator    lower_bound(const key_type &k)
             {
                 iterator    it(this->begin());
 
@@ -220,9 +240,16 @@ namespace ft
                 return (it);
             }
 
-            //TODO upper/ lower bound with const iterator
+            const_iterator  lower_bound(const key_type &k) const
+            {
+                const_iterator  it(this->begin());
 
-            iterator        upper_bound(const key_type &k)
+                while (this->_comp(it->first, k))
+                    ++it;
+                return (it);
+            }
+
+            iterator    upper_bound(const key_type &k)
             {
                 iterator    it(this->begin());
 
@@ -231,15 +258,28 @@ namespace ft
                 return (it);
             }
 
+            const_iterator  upper_bound(const key_type &k) const
+            {
+                const_iterator  it(this->begin());
+
+                while (!this->_comp(k, it->first))
+                    ++it;
+                return (it);
+            }
+
+
             ft::pair<iterator, iterator>    equal_range(const key_type &k)
             {
                 return (ft::make_pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
             }
 
-            //TODO equal_range with const iterator
+            ft::pair<const_iterator, const_iterator>    equal_range(const key_type &k) const
+            {
+                return (ft::make_pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k)));
+            }
 
         private:
-            RBTree<value_type, Compare, value_compare, Alloc> _tree;
+            RBTree<value_type, value_compare, Alloc> _tree;
             key_compare                             _comp;
             size_type                               _size;
             allocator_type                          _alloc;
@@ -247,4 +287,4 @@ namespace ft
 
 }
 
-#endif
+#endif // MAP_HPP

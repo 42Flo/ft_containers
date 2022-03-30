@@ -6,12 +6,15 @@
 # include <memory>
 
 # include "tools.hpp"
+
+template < class T, class Alloc = std::allocator<T> >
+class Node;
 # include "../iterators/bidirectional_iterator.hpp"
 
 # define BLACK 0
 # define RED 1
 
-template < class T, class Alloc = std::allocator<T> >
+template < class T, class Alloc >
 class Node
 {
     public:
@@ -72,30 +75,28 @@ class Node
         alloc_type  alloc;
 };
 
-template < class T, class Compare = std::less<T>, class KeyCompare = Compare,
-         class Alloc = std::allocator<T> >
+template < class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
 class RBTree
 {
     public:
         typedef T           value_type;
         typedef Compare     compare;
-        typedef KeyCompare  key_compare;
         typedef Alloc       alloc_type;
         typedef T*          pointer;
         typedef T&          reference;
 
-        typedef ft::bidirectional_iterator<T, Compare, KeyCompare>  iterator;
-        typedef ft::bidirectional_iterator<const T, Compare, KeyCompare>  const_iterator;
+        typedef ft::bidirectional_iterator<T, Compare>  iterator;
+        typedef ft::bidirectional_iterator<const T, Compare>  const_iterator;
         typedef typename Alloc::template rebind< Node<T, Alloc> >::other node_alloc_type;
 
-        RBTree(const key_compare &key_comp = key_compare())
-            : _root(NULL), _comp(compare()), _key_comp(key_comp),
-            _node_alloc(node_alloc_type()), _alloc(alloc_type()){}
+        RBTree(const compare &comp = compare())
+            : _root(NULL), _comp(compare()), _node_alloc(node_alloc_type()),
+            _alloc(alloc_type()){}
 
         Node<T, Alloc> *getRoot() const {return (this->_root);}
 
-        iterator    insert(value_type &data, iterator hint = NULL)
-        {//TODO return iterator to data inserted, manage hint
+        iterator    insert(value_type &data, iterator hint = 0)
+        {
             if (this->_root == NULL)
             {
                 this->_root = _createNode(data);
@@ -108,7 +109,7 @@ class RBTree
                 Node<T, Alloc>  *tmp = (_checkHint() ? hint.getCurrent() : this->_root);
                 Node<T, Alloc>  *tmp2 = tmp;
 
-                while (hint != NULL)
+                while (tmp != NULL)
                 {
                     tmp2 = tmp;
                     if (this->_comp(data, *hint))
@@ -183,7 +184,6 @@ class RBTree
     private:
         Node<T, Alloc> *_root;
         compare     _comp;
-        key_compare _key_comp;
 
         Node<T, Alloc> *_createNode(value_type &data)
         {

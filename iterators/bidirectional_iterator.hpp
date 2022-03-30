@@ -1,34 +1,42 @@
 #ifndef BIDIRECTIONAL_ITERATOR_HPP
 # define BIDIRECTIONAL_ITERATOR_HPP
 
+# include <iostream>
+# include <memory>
+
+namespace ft
+{
+    template < class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
+    class bidirectional_iterator;
+}
 # include "../tools/rb_tree.hpp"
 
 namespace ft
 {
-    template < class T, class Compare = std::less<T>, class KeyCompare = Compare,
-         class Alloc = std::allocator<T> >
+    template < class T, class Compare, class Alloc >
     class bidirectional_iterator
     {
         public:
             typedef T           value_type;
             typedef Compare     compare;
-            typedef KeyCompare  key_compare;
             typedef Alloc       alloc_type;
             typedef T*          pointer;
 
             // Default
-            bidirectional_iterator(Node<value_type, Alloc> src = 0,//TODO compile error!!!! TO FIX!
-                    const compare &comp = key_compare()) : _cur(src), _comp(comp){}
+            bidirectional_iterator(Node<value_type, Alloc> *src = 0,
+                    const compare &comp = compare()) : _cur(src), _comp(comp){}
+            //bidirectional_iterator(const compare &comp = key_compare())
+            //    : _cur(NULL), _comp(comp){}
 
             // Copy
             bidirectional_iterator(bidirectional_iterator const &src)
-                : _cur(src.getCurrent()), _comp(src.key_comp()){}
+                : _cur(src.getNode()), _comp(src.compare()){}
 
             // Assignation
             bidirectional_iterator  operator=(bidirectional_iterator &r)
             {
                 if (this != &r)
-                    this->_current = r.getCurrent();
+                    this->_cur = r.getNode();
                 return (*this);
             }
 
@@ -91,7 +99,7 @@ namespace ft
                 return (tmp);
             }
 
-            key_compare key_comp() const {return (this->_comp);}
+            compare key_comp() const {return (this->_comp);}
 
         private:
             Node<value_type, Alloc> *_cur;
