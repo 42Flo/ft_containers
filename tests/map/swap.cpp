@@ -1,5 +1,6 @@
 #include "helper.hpp"
 
+
 int main()
 {
     NS_TARGET::map<int, std::string>    map;
@@ -8,10 +9,10 @@ int main()
     NS_TARGET::map<int, std::string>::iterator  it2 = map2.begin();
 
     for (unsigned int i = 0 ; i < 5 ; ++i)
-        map.insert(ft::make_pair(i, "foo"));
+        map.insert(NS_TARGET::make_pair(i, "foo"));
     printMap(map);
     for (unsigned int i = 10 ; i < 22 ; ++i)
-        map.insert(ft::make_pair(i, "bar"));
+        map.insert(NS_TARGET::make_pair(i, "bar"));
     printMap(map2);
 
     map.swap(map2);

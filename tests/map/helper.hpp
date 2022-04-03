@@ -15,7 +15,7 @@ template < class Key, class T, class Compare = std::less<Key> >
 void    printSize(NS_TARGET::map<Key, T, Compare> &map)
 {
     std::cout << "size: " << map.size() << std::endl;
-    std::cout << "max_size: " << map.map_size() << std::endl;
+    std::cout << "max_size: " << map.max_size() << std::endl;
 }
 
 template < class Key, class T, class Compare = std::less<Key> >
@@ -25,7 +25,7 @@ void    printMap(NS_TARGET::map<Key, T, Compare> &map)
     typename NS_TARGET::map<Key, T, Compare>::iterator  ite = map.end(); 
 
     for ( ; it != ite ; ++it)
-        std::cout << *it << std::endl;
+        std::cout << it->second << std::endl;
     printSize(map);
 }
 

@@ -21,6 +21,7 @@ namespace ft
             typedef Compare     compare;
             typedef Alloc       alloc_type;
             typedef T*          pointer;
+            typedef T&          reference;
 
             // Default
             bidirectional_iterator(Node<value_type, Alloc> *src = 0,
@@ -30,7 +31,7 @@ namespace ft
 
             // Copy
             bidirectional_iterator(bidirectional_iterator const &src)
-                : _cur(src.getNode()), _comp(src.compare()){}
+                : _cur(src.getNode()), _comp(src.comp()){}
 
             // Assignation
             bidirectional_iterator  operator=(bidirectional_iterator &r)
@@ -46,9 +47,9 @@ namespace ft
 
             // Referencing
             //bidirectional_iterator  operator*(){ return (*(this->_cur));}
-            value_type  *operator*(){ return (this->_cur->data);}//not sure about that
-
-            pointer operator->(){ return (&(this->_cur->data));}
+            reference   operator*() const{ return (this->_cur->data);}//not sure about that
+            
+            pointer operator->() const{ return (&(this->_cur->data));}
 
             // Increment / Decrement
             bidirectional_iterator  &operator++()
@@ -56,7 +57,7 @@ namespace ft
                 bidirectional_iterator  parent = this->_cur->parent;
 
                 if (this->_cur->right == NULL && parent != NULL &&
-                        this->_comp((*this)->first, parent->first))
+                        this->_comp(*(*this), *parent))
                     this->_cur = this->_cur->parent;
                 else if (this->_cur->right)
                 {
@@ -80,7 +81,7 @@ namespace ft
                 bidirectional_iterator  parent = this->_cur->parent;
 
                 if (this->_cur->left == NULL && parent != NULL &&
-                        !this->_comp((*this)->first, parent->first))//TODO change compare function
+                        !this->_comp(*(*this), *parent))
                     this->_cur = this->_cur->parent;
                 else if (this->_cur->left)
                 {
@@ -109,7 +110,7 @@ namespace ft
             friend bool operator==(const bidirectional_iterator &l,
                     const bidirectional_iterator &r)
             {
-                return (l.getCurrent() == r.getCurrent());
+                return (*l == *r);
             }
 
             friend bool operator!=(const bidirectional_iterator &l,

@@ -225,27 +225,27 @@ namespace ft
             }
             // insert(): in range
             template < class InputIterator >
-                void	insert(iterator position, InputIterator first, InputIterator last,
-                        typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
-                {
-                    difference_type pos = position - this->begin();
+            void	insert(iterator position, InputIterator first, InputIterator last,
+                    typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
+            {
+                difference_type pos = position - this->begin();
 
-                    this->reserve(this->_size + (last - first));
-                    this->_shiftRight(pos, last - first);
-                    for ( ; first != last ; ++first)
-                    {
-                        this->_alloc.construct(&(this->_vector[pos++]), *first);
-                        ++this->_size;
-                    }
+                this->reserve(this->_size + (last - first));
+                this->_shiftRight(pos, last - first);
+                for ( ; first != last ; ++first)
+                {
+                    this->_alloc.construct(&(this->_vector[pos++]), *first);
+                    ++this->_size;
                 }
+            }
 
             // assign(): in range
             template < class InputIterator >
-                void    assign(InputIterator first, InputIterator last)
-                {
-                    this->clear();
-                    this->insert(this->begin(), first, last);
-                }
+            void    assign(InputIterator first, InputIterator last)
+            {
+                this->clear();
+                this->insert(this->begin(), first, last);
+            }
 
             // assign(): fill
             void    assign(size_type n, const value_type &val)

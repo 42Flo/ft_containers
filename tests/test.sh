@@ -7,9 +7,9 @@ ULINE="\e[4m"
 RESET="\e[0m"
 
 CC="c++"
-FLAGS="-Wall -Wextra"
+FLAGS="-Wall -Wextra -g -fsanitize=address"
 
-containers=(vector stack)
+containers=(vector stack map)
 path_containers="../containers"
 path_tools="../tools"
 path_it="../iterators"

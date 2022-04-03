@@ -37,7 +37,7 @@ namespace ft
 
                 protected:
                     Compare comp;
-                    value_compare(Compare c) : comp(c){}
+                    value_compare(Compare c = Compare()) : comp(c){}
 
                 public:
                     bool    operator()(const value_type &x, const value_type &y) const
@@ -53,9 +53,8 @@ namespace ft
             // Default
             explicit map(const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type())
-                : _comp(comp), _alloc(alloc)
+                : _tree(value_comp()), _comp(comp), _alloc(alloc)
             {
-                this->_tree(this->value_comp());
             }
 
             // Copy
@@ -87,7 +86,7 @@ namespace ft
 
             size_type   max_size() const
             {
-                return (this->_alloc.max_size);
+                return (this->_alloc.max_size());
             }
 
             // Element access
@@ -102,12 +101,12 @@ namespace ft
             // insert(): single element
             ft::pair<iterator, bool>    insert(const value_type &val)
             {
-                iterator    it = this->find(val->first);
+                iterator    it = this->find(val.first);
 
                 if (it != this->end())
                     return (ft::make_pair(it, false));
                 ++this->_size;
-                this->_tree.insert(val);
+                return (ft::make_pair(iterator(this->_tree.insert(val), value_comp()), true));
             }
 
             // insert(): with hint
@@ -276,6 +275,14 @@ namespace ft
             ft::pair<const_iterator, const_iterator>    equal_range(const key_type &k) const
             {
                 return (ft::make_pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k)));
+            }
+
+            void    swap(map &x)
+            {
+                ft::swap(this->_tree, x._tree);
+                ft::swap(this->_comp, x._comp);
+                ft::swap(this->_size, x._size);
+                ft::swap(this->_alloc, x._alloc);
             }
 
         private:
