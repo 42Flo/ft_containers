@@ -32,12 +32,12 @@ namespace ft
             class value_compare : public std::binary_function<value_type, value_type, bool>
             {
                 friend class map;
-                friend class RBTree<value_type, value_compare, Alloc>;
-                friend class bidirectional_iterator<value_type, value_compare, Alloc>;
+                //friend class RBTree<value_type, value_compare, Alloc>;
+                //friend class bidirectional_iterator<value_type, value_compare, Alloc>;
 
                 protected:
                     Compare comp;
-                    value_compare(Compare c = Compare()) : comp(c){}
+                    value_compare(Compare c) : comp(c){}
 
                 public:
                     bool    operator()(const value_type &x, const value_type &y) const
@@ -46,14 +46,14 @@ namespace ft
                     }
             };
 
-            typedef typename RBTree<value_type, value_compare, Alloc>::iterator  iterator;
-            typedef typename RBTree<value_type, value_compare, Alloc>::const_iterator  const_iterator;
+            typedef typename RBTree<value_type, key_compare, Alloc>::iterator  iterator;
+            typedef typename RBTree<value_type, key_compare, Alloc>::const_iterator  const_iterator;
             typedef ft::reverse_iterator<iterator>  reverse_iterator;
 
             // Default
             explicit map(const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type())
-                : _tree(value_comp()), _comp(comp), _alloc(alloc)
+                : _tree(), _comp(comp), _alloc(alloc)
             {
             }
 
@@ -94,7 +94,8 @@ namespace ft
             mapped_type &operator[](const key_type &k)
             {
                 //return (*((this->insert(ft::make_pair(k, mapped_type()))).first).second);
-                return (this->insert(ft::make_pair(k, mapped_type()))->second);
+                return (this->insert(ft::make_pair(k, mapped_type())).first->second);
+                //return (this->insert(ft::make_pair(k, mapped_type())).second);
             }
 
             // Modifiers
@@ -103,16 +104,17 @@ namespace ft
             {
                 iterator    it = this->find(val.first);
 
-                if (it != this->end())
+                if (it.getNode() != NULL && it != this->end())
                     return (ft::make_pair(it, false));
                 ++this->_size;
-                return (ft::make_pair(iterator(this->_tree.insert(val), value_comp()), true));
+                
+                return (ft::make_pair(iterator(this->_tree.insert(val)), true));
             }
 
             // insert(): with hint
             iterator    insert(iterator position, const value_type &val)
             {
-                if (iterator it = find(val->first) != end())
+                if (iterator it = this->find(val->first) != end())
                     return (it);
                 ++this->_size;
                 return (this->_tree.insert(val, position));
@@ -156,20 +158,37 @@ namespace ft
             // Iterators
             iterator    begin()
             {
-                Node<value_type, Alloc> *node = this->_tree.getRoot();
+                //Node<value_type, Alloc> *node = this->_tree.getRoot();
 
-                while (node->left != NULL && !value_comp()(node->data, node->left->data))
-                    node = node->left;
-                return (iterator(node, value_comp()));
+                //while (node != NULL && node->left != NULL)
+                //    node = node->left;
+                //return (iterator(node, value_comp()));
+                /*iterator    it(this->_tree.getRoot());
+                
+                if (it.getNode() != NULL)
+                {
+                    std::cout << "left addr: " << it.getNode()->left << std::endl;
+                    std::cout << "right addr: " << it.getNode()->right << std::endl;
+                    std::cout << "parent addr: " << it.getNode()->parent << std::endl;
+                    Node<T, Alloc>  *null = NULL;
+                    std::cout << "null addr: " << null << std::endl;
+                }*/
+                Node<value_type, Alloc> *node = this->_tree.getRoot();
             }
 
             iterator    end()
             {
-                Node<value_type, Alloc>  *node = this->_tree.getRoot();
+                //Node<value_type, Alloc>  *node = this->_tree.getRoot();
 
-                while (node->right != NULL && value_comp()(node->data, node->right->data))
-                    node = node->right;
-                return (iterator(node, value_comp()));
+                //while (node != NULL && node->right != NULL && value_comp()(node->data, node->right->data))
+                //    node = node->right;
+                //return (iterator(node, value_comp()));
+                iterator    it(this->_tree.getRoot());
+
+                std::cout << it.getNode() << std::endl;
+                while (it.getNode() != NULL)
+                    ++it;
+                return (it);
             }
 
             reverse_iterator    rbegin()
@@ -189,27 +208,24 @@ namespace ft
 
             iterator        find(const key_type &k)
             {
-                iterator    it(this->_tree.getRoot());
+                iterator    it = this->begin();
 
-                while (it != NULL)
+                while (it != this->end())
                 {
                     if (!this->_comp(it->first, k) && !this->_comp(k, it->first))
-                        return (it);
-                    else if (this->_comp(it->first, k))
-                        ++it;
-                        //*it = (*it)->right;
-                    else
-                        --it;
-                        //*it = (*it)->left;
+                        break;
+                    ++it;
                 }
-                return (this->end());
+                return (it);
             }
 
             const_iterator  find(const key_type &k) const
             {
                 const_iterator  it(this->_tree.getRoot());
 
-                while (it != NULL)
+                if (it.getNode() == NULL)
+                    return (this->end());
+                while (it != this->end())
                 {
                     if (!this->_comp(it->first, k) && !this->_comp(k, it->first))
                         return (it);
@@ -286,7 +302,7 @@ namespace ft
             }
 
         private:
-            RBTree<value_type, value_compare, Alloc> _tree;
+            RBTree<value_type, key_compare, Alloc> _tree;
             key_compare                             _comp;
             size_type                               _size;
             allocator_type                          _alloc;

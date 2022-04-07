@@ -65,8 +65,11 @@ executeTest()
     $CC $FLAGS -o $path_bin/std_$name $include -D STL $1/$2 2> $path_errors/std_$name
     [ -s $path_errors/std_$name ] || rm $path_errors/std_$name
 
-    ./$path_bin/ft_$name > $path_output/ft_$name.txt 2> /dev/null
-    ./$path_bin/std_$name > $path_output/std_$name.txt 2> /dev/null
+    #./$path_bin/ft_$name > $path_output/ft_$name.txt 2> ft_$name_exe_error
+    #./$path_bin/std_$name > $path_output/std_$name.txt 2> std_$name_exe_error
+
+    ./$path_bin/ft_$name
+    ./$path_bin/std_$name
 
     diff $path_output/ft_$name.txt $path_output/std_$name.txt > $path_diff/$name.txt
     [ -s $path_diff/$name.txt ] || rm $path_diff/$name.txt
