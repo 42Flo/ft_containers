@@ -10,6 +10,7 @@ namespace ft
     class bidirectional_iterator;
 }
 # include "../tools/rb_tree.hpp"
+# include "../containers/map.hpp"
 
 namespace ft
 {
@@ -24,10 +25,11 @@ namespace ft
             typedef T&          reference;
 
             // Default
-            bidirectional_iterator(Node<value_type, Alloc> *src = 0,
+            bidirectional_iterator(const compare &comp = compare())
+                : _cur(NULL), _comp(comp){}
+
+            bidirectional_iterator(Node<value_type, Alloc> *src,
                     const compare &comp = compare()) : _cur(src), _comp(comp){}
-            //bidirectional_iterator(const compare &comp = key_compare())
-            //    : _cur(NULL), _comp(comp){}
 
             // Copy
             bidirectional_iterator(bidirectional_iterator const &src)
@@ -57,16 +59,18 @@ namespace ft
                 bidirectional_iterator  parent = this->_cur->parent;
 
                 if (this->_cur->right == NULL && parent != NULL &&
-                        this->_comp(*(*this), *parent))
+                        this->_comp((*this)->first, parent->first))
+                        //this->_comp(*(*this), *parent))
                     this->_cur = this->_cur->parent;
-                else if (this->_cur->right)
+                else if (this->_cur->right != NULL)
                 {
                     this->_cur = this->_cur->right;
-                    while (this->_cur->left)
+                    while (this->_cur != NULL && this->_cur->left != NULL)
                         this->_cur = this->_cur->left;
                 }
                 return (*this);
             }
+            //TODO debug and fix incrementation
 
             bidirectional_iterator  operator++(int)
             {
@@ -81,12 +85,13 @@ namespace ft
                 bidirectional_iterator  parent = this->_cur->parent;
 
                 if (this->_cur->left == NULL && parent != NULL &&
-                        !this->_comp(*(*this), *parent))
+                        !this->_comp((*this)->first, parent->first))
+                        //!this->_comp(*(*this), *parent))
                     this->_cur = this->_cur->parent;
-                else if (this->_cur->left)
+                else if (this->_cur->left != NULL)
                 {
                     this->_cur = this->_cur->left;
-                    while (this->_cur->right)
+                    while (this->_cur != NULL && this->_cur->right != NULL)
                         this->_cur = this->_cur->right;
                 }
                 return (*this);
@@ -110,7 +115,7 @@ namespace ft
             friend bool operator==(const bidirectional_iterator &l,
                     const bidirectional_iterator &r)
             {
-                return (*l == *r);
+                return (l.getNode() == r.getNode());
             }
 
             friend bool operator!=(const bidirectional_iterator &l,

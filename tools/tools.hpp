@@ -34,10 +34,11 @@ namespace ft
         pair(const first_type &a, const second_type &b) : first(a), second(b){}
 
         // Assignation operator
-        pair    &operator=(const ft::pair<T1, T2> &pr)
+        ft::pair<T1, T2>  &operator=(const ft::pair<T1, T2> &pr)
         {
             first = pr.first;
             second = pr.second;
+            return (*this);
         }
 
         // Relational operators
