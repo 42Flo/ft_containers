@@ -7,7 +7,7 @@ ULINE="\e[4m"
 RESET="\e[0m"
 
 CC="c++"
-FLAGS="-Wall -Wextra -g -fsanitize=address"
+FLAGS="-Wall -Wextra -g3 -fsanitize=address"
 
 containers=(vector stack map)
 path_containers="../containers"
@@ -65,11 +65,11 @@ executeTest()
     $CC $FLAGS -o $path_bin/std_$name $include -D STL $1/$2 2> $path_errors/std_$name
     [ -s $path_errors/std_$name ] || rm $path_errors/std_$name
 
-    #./$path_bin/ft_$name > $path_output/ft_$name.txt 2> ft_$name_exe_error
-    #./$path_bin/std_$name > $path_output/std_$name.txt 2> std_$name_exe_error
+    ./$path_bin/ft_$name > $path_output/ft_$name.txt 2> ./ft_$name
+    ./$path_bin/std_$name > $path_output/std_$name.txt 2> ./std_$name
 
-    ./$path_bin/ft_$name
-    ./$path_bin/std_$name
+    #./$path_bin/ft_$name
+    #./$path_bin/std_$name
 
     diff $path_output/ft_$name.txt $path_output/std_$name.txt > $path_diff/$name.txt
     [ -s $path_diff/$name.txt ] || rm $path_diff/$name.txt
@@ -106,7 +106,6 @@ mkdir -p $path_diff
 if [[ ! ${containers[*]} =~ $1 ]]
 then
     printf "Bad arguments.\n"
-
     exit
 fi
 

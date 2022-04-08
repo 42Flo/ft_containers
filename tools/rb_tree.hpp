@@ -104,30 +104,29 @@ class RBTree
 
         RBTree(const compare &comp = compare())
             : _root(NULL), _lowest(NULL), _highest(NULL), _comp(comp),
-            _node_alloc(node_alloc_type()), _alloc(alloc_type()){}
+            _alloc(alloc_type()), _node_alloc(node_alloc_type()){}
 
         Node<T, Alloc>  *getRoot() const {return (this->_root);}
+
+        Node<T, Alloc>  *getLowest() const {return (this->_lowest);}
+
+        Node<T, Alloc>  *getHighest() const {return (this->_highest);}
 
         Node<T, Alloc>  *insert(const value_type &data, iterator hint = NULL)
         {
             if (this->_root == NULL)
-            {
-                this->_root = _createNode(data);
-                this->_root->color = BLACK;
-                return (this->_root);
-            }
-
-            //TODO init and update lowest/highest here for iterators begin() end()
+                return (this->_insertRoot(data));
 
             Node<T, Alloc>  *newNode = _createNode(data);
             Node<T, Alloc>  *tmp = (_checkHint(hint, data) ? hint.getNode() : this->_root);
             Node<T, Alloc>  *tmp2 = tmp;
 
+            this->_updateLowHigh(newNode);
             while (tmp != NULL)
             {
                 tmp2 = tmp;
                 //if (this->_comp(data, *hint))
-                if (this->_comp(data.first, hint->first))
+                if (this->_comp(data.first, tmp->data.first))
                     tmp = tmp->left;
                 else
                     tmp = tmp->right;
@@ -217,6 +216,25 @@ class RBTree
         }
 
         // Insert helpers functions
+
+        Node<T, Alloc>  *_insertRoot(const value_type &data)
+        {
+            this->_root = this->_createNode(data);
+            this->_root->color = BLACK;
+            this->_updateLowHigh(this->_root);
+            return (this->_root);
+        }
+
+        void    _updateLowHigh(Node<T, Alloc> *node)
+        {
+            if (this->_lowest == NULL ||
+                    this->_comp(this->_lowest->data.first, node->data.first))
+                this->_lowest = node;
+            if (this->_highest == NULL ||
+                    this->_comp(node->data.first, this->_highest->data.first))
+                this->_highest = node;
+        }
+
         void    _insertBalance(Node<T, Alloc> *node)
         {
             Node<T, Alloc>  *uncle;

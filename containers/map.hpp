@@ -173,22 +173,22 @@ namespace ft
                     Node<T, Alloc>  *null = NULL;
                     std::cout << "null addr: " << null << std::endl;
                 }*/
-                Node<value_type, Alloc> *node = this->_tree.getRoot();
+                return (iterator(this->_tree.getLowest()));
+            }
+
+            const_iterator  begin() const
+            {
+                return (const_iterator(this->_tree.getLowest()));
             }
 
             iterator    end()
             {
-                //Node<value_type, Alloc>  *node = this->_tree.getRoot();
+                return (iterator(this->_tree.getHighest()));
+            }
 
-                //while (node != NULL && node->right != NULL && value_comp()(node->data, node->right->data))
-                //    node = node->right;
-                //return (iterator(node, value_comp()));
-                iterator    it(this->_tree.getRoot());
-
-                std::cout << it.getNode() << std::endl;
-                while (it.getNode() != NULL)
-                    ++it;
-                return (it);
+            const_iterator  end() const
+            {
+                return (const_iterator(this->_tree.getHighest()));
             }
 
             reverse_iterator    rbegin()
@@ -221,22 +221,15 @@ namespace ft
 
             const_iterator  find(const key_type &k) const
             {
-                const_iterator  it(this->_tree.getRoot());
+                const_iterator  it = this->begin();
 
-                if (it.getNode() == NULL)
-                    return (this->end());
                 while (it != this->end())
                 {
                     if (!this->_comp(it->first, k) && !this->_comp(k, it->first))
-                        return (it);
-                    else if (this->_comp(it->first, k))
-                        ++it;
-                        //*it = (*it)->right;
-                    else
-                        --it;
-                        //*it = (*it)->left;
+                        break;
+                    ++it;
                 }
-                return (this->end());
+                return (it);
             }
 
             size_type   count(const key_type &k) const
