@@ -7,7 +7,7 @@ ULINE="\e[4m"
 RESET="\e[0m"
 
 CC="c++"
-FLAGS="-Wall -Wextra -g3 -fsanitize=address"
+FLAGS="-Wall -Wextra"
 
 containers=(vector stack map)
 path_containers="../containers"
@@ -17,6 +17,7 @@ path_it="../iterators"
 path_bin="bin"
 path_output="output"
 path_errors="compile_errors"
+path_crash="crash"
 path_diff="diff"
 
 compile_error=0
@@ -43,7 +44,7 @@ printLine()
 # $1=file_name
 getCompileErrors()
 {
-    [ ! -s $path_errors/ft_$1 ] || compile_error=1
+    [ ! -s $path_errors/ft_$1.txt ] || compile_error=1
 }
 
 # $1=file_name
@@ -59,14 +60,15 @@ executeTest()
     pname="${2%.*}"
     include="-I$path_containers -I$path_tools -I$path_it"
 
-    $CC $FLAGS -o $path_bin/ft_$name $include $1/$2 2> $path_errors/ft_$name
-    [ -s $path_errors/ft_$name ] || rm $path_errors/ft_$name # delete error file if empty
+    $CC $FLAGS -o $path_bin/ft_$name $include $1/$2 2> $path_errors/ft_$name.txt
+    [ -s $path_errors/ft_$name.txt ] || rm $path_errors/ft_$name.txt # delete error file if empty
+    $CC $FLAGS -o $path_bin/std_$name $include -D STL $1/$2 2> $path_errors/std_$name.txt
+    [ -s $path_errors/std_$name.txt ] || rm $path_errors/std_$name.txt
 
-    $CC $FLAGS -o $path_bin/std_$name $include -D STL $1/$2 2> $path_errors/std_$name
-    [ -s $path_errors/std_$name ] || rm $path_errors/std_$name
-
-    ./$path_bin/ft_$name > $path_output/ft_$name.txt 2> ./ft_$name
-    ./$path_bin/std_$name > $path_output/std_$name.txt 2> ./std_$name
+    ./$path_bin/ft_$name > $path_output/ft_$name.txt 2> $path_crash/ft_$name.txt
+    [ -s $path_crash/ft_$name.txt ] || rm $path_crash/ft_$name.txt
+    ./$path_bin/std_$name > $path_output/std_$name.txt 2> $path_crash/std_$name.txt
+    [ -s $path_crash/std_$name.txt ] || rm $path_crash/std_$name.txt
 
     #./$path_bin/ft_$name
     #./$path_bin/std_$name
@@ -101,6 +103,7 @@ initTests()
 mkdir -p $path_bin
 mkdir -p $path_output
 mkdir -p $path_errors
+mkdir -p $path_crash
 mkdir -p $path_diff
 
 if [[ ! ${containers[*]} =~ $1 ]]

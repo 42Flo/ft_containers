@@ -6,7 +6,7 @@
 
 namespace ft
 {
-    template < class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
+    template < class T, class Compare = std::less<T> >
     class bidirectional_iterator;
 }
 # include "../tools/rb_tree.hpp"
@@ -14,13 +14,12 @@ namespace ft
 
 namespace ft
 {
-    template < class T, class Compare, class Alloc >
+    template < class T, class Compare >
     class bidirectional_iterator
     {
         public:
             typedef T           value_type;
             typedef Compare     compare;
-            typedef Alloc       alloc_type;
             typedef T*          pointer;
             typedef T&          reference;
 
@@ -28,7 +27,7 @@ namespace ft
             bidirectional_iterator(const compare &comp = compare())
                 : _cur(NULL), _comp(comp){}
 
-            bidirectional_iterator(Node<value_type, Alloc> *src,
+            bidirectional_iterator(Node<value_type> *src,
                     const compare &comp = compare()) : _cur(src), _comp(comp){}
 
             // Copy
@@ -43,9 +42,9 @@ namespace ft
                 return (*this);
             }
 
-            Node<value_type, Alloc> *getNode() const{ return (this->_cur);}
+            Node<value_type> *getNode() const{ return (this->_cur);}
 
-            compare comp() const{ return (this->_comp);}
+            compare comp() const{ return (this->_comp);}//TODO
 
             // Referencing
             //bidirectional_iterator  operator*(){ return (*(this->_cur));}
@@ -68,9 +67,10 @@ namespace ft
                     while (this->_cur != NULL && this->_cur->left != NULL)
                         this->_cur = this->_cur->left;
                 }
+                else
+                    this->_cur = NULL;
                 return (*this);
             }
-            //TODO debug and fix incrementation
 
             bidirectional_iterator  operator++(int)
             {
@@ -105,10 +105,10 @@ namespace ft
                 return (tmp);
             }
 
-            compare key_comp() const {return (this->_comp);}
+            compare key_comp() const {return (this->_comp);}//TODO
 
         private:
-            Node<value_type, Alloc> *_cur;
+            Node<value_type> *_cur;
             compare             _comp;
 
             // Relational operators

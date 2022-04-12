@@ -53,14 +53,12 @@ namespace ft
             // Default
             explicit map(const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type())
-                : _tree(), _comp(comp), _alloc(alloc)
-            {
-            }
+                : _tree(), _comp(comp), _size(0), _alloc(alloc){}
 
             // Copy
-            map(const map &x)
+            map(const map &x) : _tree(x._tree), _size(x.size)
             {
-                //TODO
+                //TODO test copy constructor
             }
 
             // Fill in range
@@ -68,15 +66,26 @@ namespace ft
             map(InputIterator first, InputIterator last,
                 const key_compare &comp = key_compare(),
                 const allocator_type &alloc = allocator_type())
-                : _comp(comp), _alloc(alloc)
+                : _comp(comp), _alloc(alloc), _size(0)
             {
-                //TODO
-            }
+                while (first != last)
+                    this->insert(*first++);
+            }//TODO test fill in range constructor
 
             // Destructor
             ~map()
             {
                 //TODO
+            }
+
+            map &operator=(const map &x)
+            {
+                if (this != &x)
+                {
+                    this->_tree = x._tree;
+                    this->_size = x._size;
+                }
+                return (*this);
             }
 
             // Size / Capacity
@@ -183,12 +192,12 @@ namespace ft
 
             iterator    end()
             {
-                return (iterator(this->_tree.getHighest()));
+                return (iterator(NULL));
             }
 
             const_iterator  end() const
             {
-                return (const_iterator(this->_tree.getHighest()));
+                return (const_iterator(NULL));
             }
 
             reverse_iterator    rbegin()
@@ -212,6 +221,7 @@ namespace ft
 
                 while (it != this->end())
                 {
+                    //std::cout << "here?" << std::endl;
                     if (!this->_comp(it->first, k) && !this->_comp(k, it->first))
                         break;
                     ++it;
