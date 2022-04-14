@@ -24,7 +24,7 @@ namespace ft
         second_type second;
 
         // Default constructor
-        pair() : first(0), second(0){}
+        pair() : first(T1()), second(T2()){}
 
         // Copy constructor
         template < class U, class V>
@@ -36,8 +36,11 @@ namespace ft
         // Assignation operator
         ft::pair<T1, T2>  &operator=(const ft::pair<T1, T2> &pr)
         {
-            first = pr.first;
-            second = pr.second;
+            if (this != &pr)
+            {
+                first = pr.first;
+                second = pr.second;
+            }
             return (*this);
         }
 

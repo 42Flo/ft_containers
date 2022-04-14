@@ -35,7 +35,7 @@ namespace ft
                 : _cur(src.getNode()), _comp(src.comp()){}
 
             // Assignation
-            bidirectional_iterator  operator=(bidirectional_iterator &r)
+            bidirectional_iterator  &operator=(bidirectional_iterator const &r)
             {
                 if (this != &r)
                     this->_cur = r.getNode();

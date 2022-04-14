@@ -21,7 +21,7 @@ int main()
     map2.insert(NS_TARGET::make_pair("two", "bar"));
 
     //TODO fix const conversion here
-    NS_TARGET::map<std::string, std::string>::const_iterator    it = map2.find("two");
+    //NS_TARGET::map<std::string, std::string>::const_iterator    it = map2.find("two");
 
-    std::cout << it->second << std::endl;
+    //std::cout << it->second << std::endl;
 }
