@@ -9,11 +9,12 @@ int main()
         map.insert(NS_TARGET::make_pair(toInsert++, i));
     printMap(map);
 
+    map.erase('a');
     map.erase('d');
     map.erase('b');
     printMap(map);
 
-    map.erase(map.begin());
+    //map.erase(map.begin());
     printMap(map);
 
     map.erase(map.begin(), map.end());

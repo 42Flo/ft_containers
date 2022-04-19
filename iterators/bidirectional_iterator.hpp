@@ -48,9 +48,9 @@ namespace ft
 
             // Referencing
             //bidirectional_iterator  operator*(){ return (*(this->_cur));}
-            reference   operator*() const{ return (this->_cur->data);}//not sure about that
+            reference   operator*() const{ return (*(this->_cur->data));}//not sure about that
             
-            pointer operator->() const{ return (&(this->_cur->data));}
+            pointer operator->() const{ return (this->_cur->data);}
 
             // Increment / Decrement
             bidirectional_iterator  &operator++()

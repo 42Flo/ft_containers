@@ -133,7 +133,7 @@ namespace ft
             template < class InputIterator >
             void    insert(InputIterator first, InputIterator last,
                     typename ft::enable_if<!ft::is_integral<InputIterator>::value,
-                    InputIterator>::type = 0)
+                    InputIterator>::type * = 0)
             {
                 for ( ; first != last ; ++first)
                     this->insert(*first);
@@ -142,13 +142,15 @@ namespace ft
             // erase(): with iterator
             void    erase(iterator position)
             {
-                this->_tree.deleteNode(position.getCurrent());
+                this->_tree.deleteNode(position.getNode());
+                --this->_size;
             }
 
             // erase(): with key
             size_type   erase(const key_type &k)
             {
-                this->_tree.deleteNode(*(this->find(k)));
+                this->_tree.deleteNode(this->find(k).getNode());
+                --this->_size;
                 return (1);
             }
 
@@ -156,7 +158,10 @@ namespace ft
             void    erase(iterator first, iterator last)
             {
                 for ( ; first != last ; ++first)
-                    this->_tree.deleteNode(first.getCurrent());
+                {
+                    this->_tree.deleteNode(first.getNode());
+                    --this->_size;
+                }
             }
 
             // Observers
