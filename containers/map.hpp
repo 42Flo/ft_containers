@@ -75,7 +75,15 @@ namespace ft
             // Destructor
             ~map()
             {
-                //TODO
+                iterator    it = this->begin();
+                iterator    tmp;
+
+                while (it != this->end())
+                {
+                    tmp = it;
+                    ++it;
+                    this->_tree.deleteNode(it.getNode());
+                }
             }
 
             map &operator=(const map &x)
@@ -149,6 +157,10 @@ namespace ft
             // erase(): with key
             size_type   erase(const key_type &k)
             {
+                /*std::cout << "node: " << this->find(k)->first << std::endl;
+                std::cout << "node right: " << this->find(k).getNode()->right->data->first << std::endl;
+                std::cout << "node left: " << this->find(k).getNode()->left << std::endl;
+                std::cout << "node parent: " << this->find(k).getNode()->parent << std::endl;*/
                 this->_tree.deleteNode(this->find(k).getNode());
                 --this->_size;
                 return (1);
@@ -157,9 +169,13 @@ namespace ft
             // erase(): in range
             void    erase(iterator first, iterator last)
             {
-                for ( ; first != last ; ++first)
+                iterator    tmp;
+
+                while (first != last)
                 {
-                    this->_tree.deleteNode(first.getNode());
+                    tmp = first;
+                    ++first;
+                    this->_tree.deleteNode(tmp.getNode());
                     --this->_size;
                 }
             }

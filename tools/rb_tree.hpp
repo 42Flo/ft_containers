@@ -128,6 +128,7 @@ class RBTree
             bool    isDB = this->_checkDoubleBlack(node, r);
 
             this->_deleteUpdateLowHigh(node);
+            //this->display(this->_root, ".", true);
             /*std::cout << "deleteNode called." << std::endl;
             std::cout << "node to be deleted: " << node->data->second << std::endl;
             std::cout << "highest value: " << _highest->data->second << std::endl;
@@ -159,7 +160,7 @@ class RBTree
                     indent += "|  ";
                 }
                 std::string color = node->color ? "RED" : "BLACK";
-                std::cout << node->data.first << ", " << node->data.second <<
+                std::cout << node->data->first << ", " << node->data->second <<
                     "(" << color << ")" << std::endl;
                 display(node->left, indent, false);
                 display(node->right, indent, true);
@@ -198,6 +199,7 @@ class RBTree
             newNode->right = NULL;
             newNode->left = NULL;
             newNode->parent = NULL;
+            newNode->color = RED;
             this->_insertUpdateLowHigh(newNode);
             return (newNode);
         }
@@ -428,8 +430,8 @@ class RBTree
             else
                 node->parent->right = NULL;
             //this->_node_alloc.destroy(node);
-            this->_alloc.destroy(node->data);
-            this->_alloc.deallocate(node->data, 1);
+            //this->_alloc.destroy(node->data);
+            //this->_alloc.deallocate(node->data, 1);
             this->_node_alloc.deallocate(node, 1);
         }
 
@@ -441,9 +443,9 @@ class RBTree
                 node->left =  NULL;
                 node->right = NULL;
                 //this->_node_alloc.destroy(r);
-                this->_alloc.destroy(r->data);
-                this->_alloc.deallocate(r->data, 1);
-                this->_node_alloc.deallocate(r, 1);
+                //this->_alloc.destroy(r->data);
+                //this->_alloc.deallocate(r->data, 1);
+                //this->_node_alloc.deallocate(r, 1);//TODO fix deallocate to avoid leaks
             }
             else
             {
@@ -453,7 +455,6 @@ class RBTree
                     parent->left = r;
                 else
                     parent->right = r;
-                //this->_node_alloc.destroy(node);
                 this->_alloc.destroy(node->data);
                 this->_alloc.deallocate(node->data, 1);
                 this->_node_alloc.deallocate(node, 1);

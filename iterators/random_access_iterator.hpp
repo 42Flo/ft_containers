@@ -26,6 +26,8 @@ namespace ft
 
             pointer	getCurrent() const {return (this->_current);}
 
+            //TODO use operator-> insteed of getCurrent()
+
             // Assignation
             random_access_iterator	operator=(random_access_iterator const &r)
             {

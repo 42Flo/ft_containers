@@ -55,12 +55,16 @@ namespace ft
             // Increment / Decrement
             bidirectional_iterator  &operator++()
             {
-                bidirectional_iterator  parent = this->_cur->parent;
+                bidirectional_iterator  p = this->_cur->parent;
+                bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
 
-                if (this->_cur->right == NULL && parent != NULL &&
-                        this->_comp((*this)->first, parent->first))
+                if (this->_cur->right == NULL && p != NULL &&
+                        this->_comp((*this)->first, p->first))
                         //this->_comp(*(*this), *parent))
                     this->_cur = this->_cur->parent;
+                else if (this->_cur->right == NULL && p != NULL && gp != NULL &&
+                        this->_comp((*this)->first, gp->first))
+                    this->_cur = this->_cur->parent->parent;
                 else if (this->_cur->right != NULL)
                 {
                     this->_cur = this->_cur->right;
@@ -76,18 +80,22 @@ namespace ft
             {
                 bidirectional_iterator tmp(this->_cur);
 
-                ++this;
+                ++(*this);
                 return (tmp);
             }
 
             bidirectional_iterator  &operator--()
             {
-                bidirectional_iterator  parent = this->_cur->parent;
+                bidirectional_iterator  p = this->_cur->parent;
+                bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
 
-                if (this->_cur->left == NULL && parent != NULL &&
-                        !this->_comp((*this)->first, parent->first))
+                if (this->_cur->left == NULL && p != NULL &&
+                        !this->_comp((*this)->first, p->first))
                         //!this->_comp(*(*this), *parent))
                     this->_cur = this->_cur->parent;
+                else if (this->_cur->left == NULL && p != NULL && gp != NULL &&
+                        !this->_comp((*this)->first, gp->first))
+                    this->_cur = this->_cur->parent->parent;
                 else if (this->_cur->left != NULL)
                 {
                     this->_cur = this->_cur->left;
@@ -101,7 +109,7 @@ namespace ft
             {
                 bidirectional_iterator  tmp(this->_cur);
 
-                --this;
+                --(*this);
                 return (tmp);
             }
 

@@ -7,7 +7,7 @@ int main()
 
     {
         NS_TARGET::vector<TYPE>::iterator   it(vec.begin());
-        NS_TARGET::vector<TYPE>::iterator   ite;
+        NS_TARGET::vector<TYPE>::iterator   ite;//TODO const iterator to fix
         ite = vec.end();
 
         std::cout << (it == vec.begin()) << std::endl;
