@@ -46,12 +46,12 @@ struct Node
 
     bool    isRightChild() const
     {
-        return (this->parent->right == this);
+        return (this->parent != NULL && this->parent->right == this);
     }
 
     bool    isLeftChild() const
     {
-        return (this->parent->left == this);
+        return (this->parent != NULL && this->parent->left == this);
     }
 
     bool    hasRedChild() const
@@ -90,7 +90,7 @@ class RBTree
         Node<T>  *getRoot() const {return (this->_root);}
 
         Node<T>  *getLowest() const {return (this->_lowest);}
-
+        
         Node<T>  *getHighest() const {return (this->_highest);}
 
         Node<T>  *insert(const value_type &data, iterator hint = NULL)
@@ -128,11 +128,6 @@ class RBTree
             bool    isDB = this->_checkDoubleBlack(node, r);
 
             this->_deleteUpdateLowHigh(node);
-            //this->display(this->_root, ".", true);
-            /*std::cout << "deleteNode called." << std::endl;
-            std::cout << "node to be deleted: " << node->data->second << std::endl;
-            std::cout << "highest value: " << _highest->data->second << std::endl;
-            std::cout << "lowest value: " << _lowest->data->second << std::endl;*/
             if (r == NULL)
                 this->_deleteLeaf(node, isDB);
             else if (node->left == NULL || node->right == NULL)
@@ -204,7 +199,7 @@ class RBTree
             return (newNode);
         }
 
-        // Insert helpers functions
+        /// Insert helpers functions
 
         Node<T>  *_insertRoot(const value_type &data)
         {
@@ -300,7 +295,8 @@ class RBTree
             _rotateRight((*node)->parent->parent);
         }
 
-        // Delete helpers functions
+        /// Delete helpers functions
+
         void    _deleteUpdateLowHigh(Node<T> *node)
         {
             if (node == this->_highest)
@@ -427,11 +423,10 @@ class RBTree
             }
             if (node->isLeftChild())
                 node->parent->left = NULL;
-            else
+            else if (node->parent != NULL)
                 node->parent->right = NULL;
-            //this->_node_alloc.destroy(node);
-            //this->_alloc.destroy(node->data);
-            //this->_alloc.deallocate(node->data, 1);
+            this->_alloc.destroy(node->data);
+            this->_alloc.deallocate(node->data, 1);
             this->_node_alloc.deallocate(node, 1);
         }
 
@@ -439,13 +434,13 @@ class RBTree
         {
             if (node == this->_root)
             {
-                node->data = r->data;
-                node->left =  NULL;
-                node->right = NULL;
-                //this->_node_alloc.destroy(r);
-                //this->_alloc.destroy(r->data);
-                //this->_alloc.deallocate(r->data, 1);
-                //this->_node_alloc.deallocate(r, 1);//TODO fix deallocate to avoid leaks
+                this->_root = r;
+                r->parent = NULL;
+                r->left = NULL;
+                r->right = NULL;
+                this->_alloc.destroy(node->data);
+                this->_alloc.deallocate(node->data, 1);
+                this->_node_alloc.deallocate(node, 1);
             }
             else
             {

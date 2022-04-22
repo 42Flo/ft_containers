@@ -23,18 +23,22 @@ namespace ft
             typedef T*          pointer;
             typedef T&          reference;
 
-            // Default
+            /// Constructors
+
+            // default
             bidirectional_iterator(const compare &comp = compare())
                 : _cur(NULL), _comp(comp){}
 
+            // by Node
             bidirectional_iterator(Node<value_type> *src,
                     const compare &comp = compare()) : _cur(src), _comp(comp){}
 
-            // Copy
+            // copy
             bidirectional_iterator(bidirectional_iterator const &src)
                 : _cur(src.getNode()), _comp(src.comp()){}
 
-            // Assignation
+            /// Assignation operator
+
             bidirectional_iterator  &operator=(bidirectional_iterator const &r)
             {
                 if (this != &r)
@@ -46,13 +50,14 @@ namespace ft
 
             compare comp() const{ return (this->_comp);}//TODO
 
-            // Referencing
-            //bidirectional_iterator  operator*(){ return (*(this->_cur));}
-            reference   operator*() const{ return (*(this->_cur->data));}//not sure about that
+            /// Referencing
+
+            reference   operator*() const{ return (*(this->_cur->data));}
             
             pointer operator->() const{ return (this->_cur->data);}
 
-            // Increment / Decrement
+            /// Increment / Decrement
+
             bidirectional_iterator  &operator++()
             {
                 bidirectional_iterator  p = this->_cur->parent;
@@ -119,7 +124,8 @@ namespace ft
             Node<value_type> *_cur;
             compare             _comp;
 
-            // Relational operators
+            /// Relational operators
+
             friend bool operator==(const bidirectional_iterator &l,
                     const bidirectional_iterator &r)
             {
