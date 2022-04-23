@@ -14,7 +14,7 @@ int main()
     map.erase('b');
     printMap(map);
 
-    //map.erase(map.begin());
+    //map.erase(map.begin()); //TODO segv to fix here
     printMap(map);
 
     map.erase(map.begin(), map.end());

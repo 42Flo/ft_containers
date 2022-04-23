@@ -9,7 +9,7 @@ RESET="\e[0m"
 CC="c++"
 FLAGS="-Wall -Wextra -g -fsanitize=address"
 
-containers=(vector stack map)
+containers=(vector stack map set)
 path_containers="../containers"
 path_tools="../tools"
 path_it="../iterators"

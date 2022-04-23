@@ -14,7 +14,7 @@ int main()
     }
     printMap(map);
     for (unsigned int i = 10 ; i < 22 ; ++i)
-        map.insert(NS_TARGET::make_pair(i, "bar"));
+        map2.insert(NS_TARGET::make_pair(i, "bar"));
     printMap(map2);
 
     map.swap(map2);
