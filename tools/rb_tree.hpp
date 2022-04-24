@@ -10,7 +10,8 @@
 template < class T >
 struct Node;
 
-template < class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
+template < class T, class Compare = std::less<T>, class ValueCompare = Compare,
+        class Alloc = std::allocator<T> >
 class RBTree;
 
 # include "../iterators/bidirectional_iterator.hpp"
@@ -68,24 +69,24 @@ struct Node
     Node        *parent;
 };
 
-template < class T, class Compare, class Alloc >
+template < class T, class Compare, class ValueCompare, class Alloc >
 class RBTree
 {
     public:
-        typedef T           value_type;
-        typedef Compare     compare;
-        typedef Alloc       alloc_type;
-        typedef T*          pointer;
-        typedef T&          reference;
+        typedef T               value_type;
+        typedef Compare         compare;
+        typedef ValueCompare    value_compare;
+        typedef Alloc           alloc_type;
+        typedef T*              pointer;
+        typedef T&              reference;
 
-        typedef ft::bidirectional_iterator<T, Compare>  iterator;
-        typedef ft::bidirectional_iterator<const T, Compare>  const_iterator;
-        //typedef typename Alloc::template rebind< Node<T, Alloc> >::other node_alloc_type;
+        typedef ft::bidirectional_iterator<T, Compare, ValueCompare>  iterator;
+        typedef ft::bidirectional_iterator<const T, Compare, ValueCompare>  const_iterator;
         typedef std::allocator<Node<T>>  node_alloc_type;
 
         RBTree(const compare &comp = compare())
             : _root(NULL), _lowest(NULL), _highest(NULL), _comp(comp),
-            _alloc(alloc_type()), _node_alloc(node_alloc_type()){}
+            _val_comp(comp), _alloc(alloc_type()), _node_alloc(node_alloc_type()){}
 
         Node<T>  *getRoot() const {return (this->_root);}
 
@@ -105,14 +106,14 @@ class RBTree
             while (tmp != NULL)
             {
                 tmp2 = tmp;
-                //if (this->_comp(data, *hint))
-                if (this->_comp(data.first, tmp->data->first))
+                //if (this->_comp(data.first, tmp->data->first))
+                if (this->_val_comp(data, *(tmp->data)))
                     tmp = tmp->left;
                 else
                     tmp = tmp->right;
             }
-            //if (this->_comp(tmp2->data, newNode->data))
-            if (this->_comp(tmp2->data->first, newNode->data->first))
+            //if (this->_comp(tmp2->data->first, newNode->data->first))
+            if (this->_val_comp(*(tmp2->data), *(newNode->data)))
                 tmp2->right = newNode;
             else
                 tmp2->left = newNode;
@@ -181,6 +182,7 @@ class RBTree
         Node<T>  *_lowest;
         Node<T>  *_highest;
         compare _comp;
+        value_compare   _val_comp;
         alloc_type  _alloc;
         node_alloc_type _node_alloc;  
 
@@ -211,10 +213,12 @@ class RBTree
         void    _insertUpdateLowHigh(Node<T> *node)
         {
             if (this->_lowest == NULL ||
-                    this->_comp(node->data->first, this->_lowest->data->first))
+                    this->_val_comp(*(node->data), *(this->_lowest->data)))
+                    //this->_comp(node->data->first, this->_lowest->data->first))
                 this->_lowest = node;
             if (this->_highest == NULL ||
-                    this->_comp(this->_highest->data->first, node->data->first))
+                    this->_val_comp(*(this->_highest->data), *(node->data)))
+                    //this->_comp(this->_highest->data->first, node->data->first))
                 this->_highest = node;
         }
 
@@ -226,11 +230,11 @@ class RBTree
             {
                 uncle = node->getUncle();
                 if (uncle != NULL && uncle->color == RED)
-                    _fixUncleRed(uncle, &node);
+                    this->_fixUncleRed(uncle, &node);
                 else if (node->parent->isRightChild())
-                    _insertBalanceRight(&node);
+                    this->_insertBalanceRight(&node);
                 else
-                    _insertBalanceLeft(&node);
+                    this->_insertBalanceLeft(&node);
                 if (node == this->_root)
                     break;
             }
@@ -241,11 +245,11 @@ class RBTree
         {
             if (hint == NULL)
                 return (false);
-            //if (this->_comp(val, this->_root->data))
-            if (this->_comp(val.first, this->_root->data->first))
+            //if (this->_comp(val.first, this->_root->data->first))
+            if (this->_val_comp(val, *(this->_root->data)))
             {
-                //if (!this->_comp(*hint, this->_root->data) ||
-                if (!this->_comp(hint->first, this->_root->data->first) ||
+                //if (!this->_comp(hint->first, this->_root->data->first) ||
+                if (!this->_val_comp(*hint, *(this->_root->data)) ||
                         hint.getNode()->isRightChild() ||
                         (hint.getNode()->parent != NULL &&
                          hint.getNode()->parent->isRightChild()))
@@ -254,7 +258,8 @@ class RBTree
             else
             {
                 //if (this->_comp(*hint, this->_root->data) ||
-                if (this->_comp(hint->first, this->_root->data->first) ||
+                //if (this->_comp(hint->first, this->_root->data->first) ||
+                if (this->_val_comp(*hint, *(this->_root->data)) ||
                         hint.getNode()->isLeftChild() ||
                         (hint.getNode()->parent != NULL &&
                          hint.getNode()->parent->isLeftChild()))

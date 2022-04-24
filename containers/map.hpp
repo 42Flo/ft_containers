@@ -32,8 +32,8 @@ namespace ft
             class value_compare : public std::binary_function<value_type, value_type, bool>
             {
                 friend class map;
-                //friend class RBTree<value_type, value_compare, Alloc>;
-                //friend class bidirectional_iterator<value_type, value_compare, Alloc>;
+                friend class RBTree<value_type, key_compare, value_compare, Alloc>;
+                friend class bidirectional_iterator<value_type, key_compare, value_compare>;
 
                 protected:
                     Compare comp;
@@ -46,8 +46,10 @@ namespace ft
                     }
             };
 
-            typedef typename RBTree<value_type, key_compare, Alloc>::iterator  iterator;
-            typedef typename RBTree<value_type, key_compare, Alloc>::const_iterator  const_iterator;
+            typedef typename
+                RBTree<value_type, key_compare, value_compare, Alloc>::iterator iterator;
+            typedef typename
+                RBTree<value_type, key_compare, value_compare, Alloc>::const_iterator const_iterator;
             typedef ft::reverse_iterator<iterator>  reverse_iterator;
 
             /// Constructors
@@ -327,7 +329,7 @@ namespace ft
             }
 
         private:
-            RBTree<value_type, key_compare, Alloc>  _tree;
+            RBTree<value_type, key_compare, value_compare, Alloc>  _tree;
             key_compare _comp;
             size_type   _size;
             allocator_type  _alloc;

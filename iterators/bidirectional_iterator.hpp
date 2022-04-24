@@ -6,7 +6,7 @@
 
 namespace ft
 {
-    template < class T, class Compare = std::less<T> >
+    template < class T, class Compare = std::less<T>, class ValueCompare = Compare>
     class bidirectional_iterator;
 }
 # include "../tools/rb_tree.hpp"
@@ -14,28 +14,29 @@ namespace ft
 
 namespace ft
 {
-    template < class T, class Compare >
+    template < class T, class Compare, class ValueCompare >
     class bidirectional_iterator
     {
         public:
-            typedef T           value_type;
-            typedef Compare     compare;
-            typedef T*          pointer;
-            typedef T&          reference;
+            typedef T               value_type;
+            typedef Compare         compare;
+            typedef ValueCompare    value_compare;
+            typedef T*              pointer;
+            typedef T&              reference;
 
             /// Constructors
 
             // default
             bidirectional_iterator(const compare &comp = compare())
-                : _cur(NULL), _comp(comp){}
+                : _cur(NULL), _comp(comp), _val_comp(comp){}
 
             // by Node
-            bidirectional_iterator(Node<value_type> *src,
-                    const compare &comp = compare()) : _cur(src), _comp(comp){}
+            bidirectional_iterator(Node<value_type> *src, const compare &comp = compare())
+                : _cur(src), _comp(comp), _val_comp(comp){}
 
             // copy
             bidirectional_iterator(bidirectional_iterator const &src)
-                : _cur(src.getNode()), _comp(src.comp()){}
+                : _cur(src.getNode()), _comp(src.comp()), _val_comp(src.comp()){}
 
             /// Assignation operator
 
@@ -48,7 +49,7 @@ namespace ft
 
             Node<value_type> *getNode() const{ return (this->_cur);}
 
-            compare comp() const{ return (this->_comp);}//TODO
+            compare comp() const{ return (this->_comp);}
 
             /// Referencing
 
@@ -64,11 +65,10 @@ namespace ft
                 bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
 
                 if (this->_cur->right == NULL && p != NULL &&
-                        this->_comp((*this)->first, p->first))
-                        //this->_comp(*(*this), *parent))
+                        this->_val_comp(*(*this), *p))
                     this->_cur = this->_cur->parent;
                 else if (this->_cur->right == NULL && p != NULL && gp != NULL &&
-                        this->_comp((*this)->first, gp->first))
+                        this->_val_comp(*(*this), *gp))
                     this->_cur = this->_cur->parent->parent;
                 else if (this->_cur->right != NULL)
                 {
@@ -95,11 +95,10 @@ namespace ft
                 bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
 
                 if (this->_cur->left == NULL && p != NULL &&
-                        !this->_comp((*this)->first, p->first))
-                        //!this->_comp(*(*this), *parent))
+                        !this->_val_comp(*(*this), *p))
                     this->_cur = this->_cur->parent;
                 else if (this->_cur->left == NULL && p != NULL && gp != NULL &&
-                        !this->_comp((*this)->first, gp->first))
+                        !this->_comp(*(*this), *gp))
                     this->_cur = this->_cur->parent->parent;
                 else if (this->_cur->left != NULL)
                 {
@@ -118,11 +117,10 @@ namespace ft
                 return (tmp);
             }
 
-            compare key_comp() const {return (this->_comp);}//TODO
-
         private:
-            Node<value_type> *_cur;
+            Node<value_type>    *_cur;
             compare             _comp;
+            value_compare       _val_comp;
 
             /// Relational operators
 
