@@ -2,23 +2,27 @@
 # define RANDOM_ACCESS_ITERATOR_HPP
 
 # include <cstddef>
+# include "../tools/type_traits.hpp"
 
 namespace ft
 {
-    template < class T >
+    template < class T, bool B >
     class random_access_iterator
     {
         public:
-            typedef T	            value_type;
+            //typedef T	            value_type;
+            typedef typename ft::conditional<B, const T, T>::type value_type;
             typedef std::ptrdiff_t	difference_type;
-            typedef T&	            reference;
-            typedef T*	            pointer;
+            //typedef typename ft::conditional<B, const T&, T&>::type   reference;
+            //typedef typename ft::conditional<B, const T*, T*>::type   pointer;
+            typedef value_type&     reference;
+            typedef value_type*     pointer;
 
             // Default constructor
             random_access_iterator(pointer val = 0) : _current(val){}
 
             // Copy constructor
-            random_access_iterator(random_access_iterator const &src)
+            random_access_iterator(random_access_iterator<T, false> const &src)
                 : _current(src.getCurrent()){}
 
             // Destructor
@@ -29,15 +33,21 @@ namespace ft
             //TODO use operator-> insteed of getCurrent()
 
             // Assignation
-            random_access_iterator	operator=(random_access_iterator const &r)
+            random_access_iterator	&operator=(random_access_iterator const &r)//TODO return ref
             {
                 if (this != &r)
-                    this->_current = r.getCurrent();
+                    this->_current = r.operator->();
+                    //this->_current = r.getCurrent();
                 return (*this);
             }
 
             // Referencing
             reference	operator*(){ return (*(this->_current));}
+
+            pointer operator->(){ return (this->_current);}
+
+            pointer operator->() const {return (this->_current);}
+
             reference	operator[](int r)
             {
                 return (*(this->_current + r));
@@ -113,7 +123,7 @@ namespace ft
             friend bool	operator!=(const random_access_iterator &l,
                     const random_access_iterator &r)
             {
-                return (l.getCurrent() != r.getCurrent());
+                return (!(l == r));
             }
             friend bool	operator<(const random_access_iterator &l,
                     const random_access_iterator &r)

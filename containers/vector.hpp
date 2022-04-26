@@ -22,8 +22,8 @@ namespace ft
 			typedef typename allocator_type::const_reference    const_reference;
 			typedef typename allocator_type::pointer	        pointer;
 			typedef typename allocator_type::const_pointer	    const_pointer;
-			typedef ft::random_access_iterator<T>	            iterator;
-            typedef ft::random_access_iterator<const T>         const_iterator;
+			typedef ft::random_access_iterator<T, false>	    iterator;
+            typedef ft::random_access_iterator<T, true>         const_iterator;
             typedef ft::reverse_iterator<iterator>              reverse_iterator;
 			typedef size_t                                      size_type;
             typedef ptrdiff_t                                   difference_type;
@@ -78,12 +78,14 @@ namespace ft
             // Iterators
             iterator    begin()
             { 
-                return (iterator(&(this->_vector[0])));
+                //return (iterator(&(this->_vector[0])));
+                return (iterator(this->_vector));
             }
 
             const_iterator  begin() const
             {
-                return (const_iterator(&(this->_vector[0])));
+                return (const_iterator(this->_vector));
+                //return (const_iterator(&(this->_vector[0])));
             }
 
             reverse_iterator    rbegin()
@@ -94,12 +96,14 @@ namespace ft
 
             iterator    end()
             { 
-                return (iterator(&(this->_vector[this->_size])));
+                return (iterator(this->_vector + this->_size));
+                //return (iterator(&(this->_vector[this->_size])));
             }
 
             const_iterator  end() const
             {
-                return (const_iterator(&(this->_vector[this->_size])));
+                return (const_iterator(this->_vector + this->_size));
+                //return (const_iterator(&(this->_vector[this->_size])));
             }
 
             reverse_iterator    rend()
@@ -268,7 +272,7 @@ namespace ft
                 difference_type n = last - first;
 
                 for ( ; first != last ; ++first)
-                    this->_alloc.destroy(&(*first));//TODO same here
+                    this->_alloc.destroy(&(*first));
                 this->_shiftLeft(last - this->begin() - 1, n);
                 this->_size -= n;
                 return (last);
@@ -285,7 +289,7 @@ namespace ft
             void	clear()
             {
                 for (unsigned int i = 0 ; i < this->_size ; ++i)
-                    this->_alloc.destroy(&(this->_vector[i]));//TODO use iterator
+                    this->_alloc.destroy(&(this->_vector[i]));
                 this->_size = 0;
             }
 
@@ -351,7 +355,6 @@ namespace ft
                     for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
                     {
                         this->_alloc.construct(&(*toWrite--), *toDelete);
-                        //*toDelete = 0;
                         this->_alloc.destroy(&(*toDelete--));
                     }
                 }
@@ -359,15 +362,14 @@ namespace ft
 
             void    _shiftLeft(difference_type pos, size_type n)
             {
-                if ((size_type)pos < this->_size)
+                if ((size_type)pos + 1 < this->_size)
                 {
                     iterator    toWrite = this->begin() + pos - n + 1;
                     iterator    toDelete = this->begin() + pos + 1;
 
-                    for (unsigned int i = 0 ; i < this->_size - pos ; ++i)
+                    for (unsigned int i = 0 ; i < pos ; ++i)
                     {
                         this->_alloc.construct(&(*toWrite++), *toDelete);
-                        //*toDelete = 0;
                         this->_alloc.destroy(&(*toDelete++));
                     }
                 }

@@ -26,8 +26,10 @@ namespace ft
             typedef size_t  size_type;
             typedef ptrdiff_t   difference_type;
 
-            typedef typename RBTree<value_type, key_compare, Alloc>::iterator   iterator;
-            typedef typename RBTree<value_type, key_compare, Alloc>::const_iterator   const_iterator;
+            typedef typename
+                RBTree<value_type, key_compare, value_compare, Alloc>::iterator    iterator;
+            typedef typename
+                RBTree<value_type, key_compare, value_compare, Alloc>::const_iterator   const_iterator;
             typedef typename ft::reverse_iterator<iterator> reverse_iterator;
 
             /// Constructors
@@ -121,7 +123,7 @@ namespace ft
             // insert(): single element
             ft::pair<iterator, bool>    insert(const value_type &val)
             {
-                iterator    it = this->find(val->first);
+                iterator    it = this->find(val);
 
                 if (it.getNode() != NULL && it != this->end())
                     return (ft::make_pair(it, false));
@@ -185,7 +187,7 @@ namespace ft
                 {
                     tmp = it;
                     ++it;
-                    this->_tree.deleteNode(tmp.getNode);
+                    this->_tree.deleteNode(tmp.getNode());
                 }
                 this->_size = 0;
             }
@@ -212,6 +214,7 @@ namespace ft
                         break;
                     ++it;
                 } 
+                return (it);
             }
 
             iterator    lower_bound(const value_type &val)
@@ -238,7 +241,7 @@ namespace ft
             }
 
         private:
-            RBTree<value_type, key_compare, Alloc>  _tree;
+            RBTree<value_type, key_compare, value_compare, Alloc>  _tree;
             key_compare _comp;
             size_type   _size;
             allocator_type  _alloc;

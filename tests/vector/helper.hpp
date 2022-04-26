@@ -26,8 +26,8 @@ void    printSize(NS_TARGET::vector<T> &vec)//TODO same
 template <class T>
 void    printVector(NS_TARGET::vector<T> &vec)//TODO const vec, const it
 {
-    typename NS_TARGET::vector<T>::iterator    it = vec.begin();
-    typename NS_TARGET::vector<T>::iterator    ite = vec.end();
+    typename NS_TARGET::vector<T>::const_iterator    it = vec.begin();
+    typename NS_TARGET::vector<T>::const_iterator    ite = vec.end();
     
     for ( ; it != ite ; ++it)
         std::cout << *it << std::endl;

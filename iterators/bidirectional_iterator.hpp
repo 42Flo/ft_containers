@@ -98,7 +98,7 @@ namespace ft
                         !this->_val_comp(*(*this), *p))
                     this->_cur = this->_cur->parent;
                 else if (this->_cur->left == NULL && p != NULL && gp != NULL &&
-                        !this->_comp(*(*this), *gp))
+                        !this->_val_comp(*(*this), *gp))
                     this->_cur = this->_cur->parent->parent;
                 else if (this->_cur->left != NULL)
                 {
