@@ -19,7 +19,7 @@ template <class T>
 void    printSize(NS_TARGET::vector<T> &vec)//TODO same
 {
     std::cout << "size: " << vec.size() << std::endl;
-    std::cout << "capacity: " << vec.capacity() << std::endl;
+    //std::cout << "capacity: " << vec.capacity() << std::endl;
     std::cout << "max_size: " << vec.max_size() << std::endl;
 }
 

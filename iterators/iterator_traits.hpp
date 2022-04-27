@@ -11,10 +11,10 @@ namespace ft
 			typedef typename Iterator::value_type	        value_type;
 			typedef typename Iterator::pointer	            pointer;
 			typedef typename Iterator::reference	        reference;
-			typedef typename Iterator::iterator_category    iterator_category;
+			//typedef typename Iterator::iterator_category    iterator_category;
 	};
-    template < class T > class iterator_traits<T*>;
-    template < class T > class iterator_traits<const T*>;
+    //template < class T > class iterator_traits<T*>;
+    //template < class T > class iterator_traits<const T*>;
 }
 
 #endif // ITERATOR_TRAITS_HPP

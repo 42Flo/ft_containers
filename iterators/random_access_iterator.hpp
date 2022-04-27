@@ -2,6 +2,7 @@
 # define RANDOM_ACCESS_ITERATOR_HPP
 
 # include <cstddef>
+# include <iostream>
 # include "../tools/type_traits.hpp"
 
 namespace ft
@@ -10,11 +11,8 @@ namespace ft
     class random_access_iterator
     {
         public:
-            //typedef T	            value_type;
             typedef typename ft::conditional<B, const T, T>::type value_type;
             typedef std::ptrdiff_t	difference_type;
-            //typedef typename ft::conditional<B, const T&, T&>::type   reference;
-            //typedef typename ft::conditional<B, const T*, T*>::type   pointer;
             typedef value_type&     reference;
             typedef value_type*     pointer;
 
@@ -23,7 +21,7 @@ namespace ft
 
             // Copy constructor
             random_access_iterator(random_access_iterator<T, false> const &src)
-                : _current(src.getCurrent()){}
+                : _current(src.operator->()){}
 
             // Destructor
             ~random_access_iterator(){}
@@ -42,13 +40,14 @@ namespace ft
             }
 
             // Referencing
-            reference	operator*(){ return (*(this->_current));}
+
+            reference	operator*() const { return (*(this->_current));}
 
             pointer operator->(){ return (this->_current);}
 
             pointer operator->() const {return (this->_current);}
 
-            reference	operator[](int r)
+            reference	operator[](difference_type r) const
             {
                 return (*(this->_current + r));
             }
@@ -88,7 +87,7 @@ namespace ft
             {
                 return (this->_current - r);
             }
-            difference_type operator-(random_access_iterator const &r)
+            difference_type operator-(random_access_iterator const &r) const
             {
                 return (this->_current - r.getCurrent());
             }
@@ -118,7 +117,8 @@ namespace ft
             friend bool	operator==(const random_access_iterator &l,
                     const random_access_iterator &r)
             {
-                return (l.getCurrent() == r.getCurrent());
+                //return (l.getCurrent() == r.getCurrent());
+                return (l.operator->() == r.operator->());
             }
             friend bool	operator!=(const random_access_iterator &l,
                     const random_access_iterator &r)
