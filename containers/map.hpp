@@ -47,10 +47,14 @@ namespace ft
                     }
             };
 
-            typedef typename
-                RBTree<value_type, key_compare, value_compare, Alloc>::iterator iterator;
-            typedef typename
-                RBTree<value_type, key_compare, value_compare, Alloc>::const_iterator const_iterator;
+            //typedef typename
+            //    RBTree<value_type, key_compare, value_compare, Alloc>::iterator iterator;
+            //typedef typename
+            //    RBTree<value_type, key_compare, value_compare, Alloc>::const_iterator const_iterator;
+            typedef
+                ft::bidirectional_iterator<value_type, false, key_compare, value_compare>    iterator;
+            typedef
+                ft::bidirectional_iterator<value_type, true, key_compare, value_compare> const_iterator;
             typedef ft::reverse_iterator<iterator>  reverse_iterator;
             typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 

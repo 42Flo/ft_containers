@@ -29,16 +29,19 @@ namespace ft
             /// Constructors
 
             // default
-            bidirectional_iterator(const compare &comp = compare())
-                : _cur(NULL), _comp(comp), _val_comp(comp){}
+            //bidirectional_iterator(const compare &comp = compare())
+            //    : _cur(NULL), _comp(comp), _val_comp(comp){}
 
             // by Node
-            bidirectional_iterator(node_ptr src, const compare &comp = compare())
+            bidirectional_iterator(node_ptr src = 0, const compare &comp = compare())
                 : _cur(src), _comp(comp), _val_comp(comp){}
 
             // copy
-            bidirectional_iterator(bidirectional_iterator<value_type, false, Compare, ValueCompare> const &src)
+            bidirectional_iterator(bidirectional_iterator<T, false, Compare, ValueCompare> const &src)
                 : _cur(src.getNode()), _comp(src.comp()), _val_comp(src.comp()){}
+            
+            //bidirectional_iterator(bidirectional_iterator<value_type, true, Compare, ValueCompare> const &src)
+              //  : _cur(src.getNode()), _comp(src.comp()), _val_comp(src.comp()){}
 
             /// Assignation operator
 
