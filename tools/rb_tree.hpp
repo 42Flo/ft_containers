@@ -80,9 +80,9 @@ class RBTree
         typedef T*              pointer;
         typedef T&              reference;
 
-        typedef ft::bidirectional_iterator<T, Compare, ValueCompare>  iterator;
-        typedef ft::bidirectional_iterator<const T, Compare, ValueCompare>  const_iterator;
-        typedef std::allocator<Node<T>>  node_alloc_type;
+        typedef ft::bidirectional_iterator<T, false, Compare, ValueCompare>  iterator;
+        typedef ft::bidirectional_iterator<T, true, Compare, ValueCompare>  const_iterator;
+        typedef std::allocator< Node<T> >  node_alloc_type;
 
         RBTree(const compare &comp = compare())
             : _root(NULL), _lowest(NULL), _highest(NULL), _comp(comp),

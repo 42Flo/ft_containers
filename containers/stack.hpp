@@ -31,7 +31,6 @@ namespace ft
         protected:
             container_type    _ctnr;
 
-        private:
             friend bool operator==(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {

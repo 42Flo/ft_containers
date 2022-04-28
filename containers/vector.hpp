@@ -61,13 +61,23 @@ namespace ft
                 this->insert(this->begin(), first, last);
 			}
 
-            //TODO destructor
+            // Destructor
+
+            ~vector()
+            {
+                this->clear();
+                if (this->_capacity != 0)
+                    this->_alloc.deallocate(this->_vector, this->_capacity);
+            }
 
 			// Assignation operator
 			ft::vector<T, Alloc>	operator=(const ft::vector<T, Alloc> &x)
 			{
                 if (&x != this)
                 {
+                    this->clear();
+                    if (this->_capacity != 0)
+                        this->_alloc.deallocate(this->_vector, this->_capacity);
                     this->_alloc = x.get_allocator();
                     this->_size = 0;
                     this->_capacity = 0;
@@ -358,6 +368,7 @@ namespace ft
                 }
             }
 
+        private:
             pointer _vector;
             size_type	_size;
             size_type	_capacity;

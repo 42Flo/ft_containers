@@ -15,7 +15,7 @@ namespace ft
         typedef T type;
     };
 
-    // is_integral:         set integral_constant::type to true if overloaded
+    // is_integral:         set type to true if overloaded
     //                      by an integral type, otherwise type is false
 
     template < class T, class = void>
@@ -56,6 +56,26 @@ namespace ft
 
     template <>
     struct is_integral<unsigned long long> { const static bool value = true;};
+
+    // is_const:            set type to true if T is const,
+    //                      otherwise type is false
+    
+    template < class T >
+    struct is_const { const static bool value = false;};
+
+    template < class T >
+    struct is_const<const T> { const static bool value = true;};
+
+    // conditional:
+
+    template < bool B, class T, class F >
+    struct conditional {};
+
+    template < class T, class F>
+    struct conditional<true, T, F> { typedef T type;};
+
+    template < class T, class F>
+    struct conditional<false, T, F> { typedef F type;};
 }
 
 #endif // UTILS_HPP

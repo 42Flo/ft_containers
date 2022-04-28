@@ -27,13 +27,14 @@ namespace ft
             typedef typename allocator_type::pointer    pointer;
             typedef typename allocator_type::const_pointer  const_pointer;
             typedef size_t  size_type;
-            typedef ptrdiff_t   difference_type;
+            typedef std::ptrdiff_t   difference_type;
 
             class value_compare : public std::binary_function<value_type, value_type, bool>
             {
                 friend class map;
                 friend class RBTree<value_type, key_compare, value_compare, Alloc>;
-                friend class bidirectional_iterator<value_type, key_compare, value_compare>;
+                friend class bidirectional_iterator<value_type, false, key_compare, value_compare>;
+                friend class bidirectional_iterator<value_type, true, key_compare, value_compare>;
 
                 protected:
                     Compare comp;
@@ -51,6 +52,7 @@ namespace ft
             typedef typename
                 RBTree<value_type, key_compare, value_compare, Alloc>::const_iterator const_iterator;
             typedef ft::reverse_iterator<iterator>  reverse_iterator;
+            typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 
             /// Constructors
 
@@ -60,7 +62,7 @@ namespace ft
                 : _tree(), _comp(comp), _size(0), _alloc(alloc){}
 
             // copy
-            map(const map &x) : _tree(x._tree), _size(x.size)
+            map(const map &x) : _tree(x._tree), _size(x._size)
             {
                 //TODO test copy constructor
             }
@@ -70,7 +72,7 @@ namespace ft
             map(InputIterator first, InputIterator last,
                     const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type())
-                : _comp(comp), _alloc(alloc), _size(0)
+                : _comp(comp), _size(0), _alloc(alloc)
             {
                 while (first != last)
                     this->insert(*first++);
@@ -163,7 +165,9 @@ namespace ft
             // insert(): with hint
             iterator    insert(iterator position, const value_type &val)
             {
-                if (iterator it = this->find(val->first) != this->end())
+                iterator    it = this->find(val.first);
+
+                if (it != this->end())
                     return (it);
                 ++this->_size;
                 return (this->_tree.insert(val, position));

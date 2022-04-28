@@ -31,7 +31,7 @@ namespace ft
             //TODO use operator-> insteed of getCurrent()
 
             // Assignation
-            random_access_iterator	&operator=(random_access_iterator const &r)//TODO return ref
+            random_access_iterator	&operator=(random_access_iterator const &r)
             {
                 if (this != &r)
                     this->_current = r.operator->();

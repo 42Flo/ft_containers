@@ -93,7 +93,7 @@ namespace ft
 
             difference_type     operator-(reverse_iterator const &r) const
             {
-                return (-(this->_base - r.base()));
+                return (r.base() - this->_base);
             }
 
             //Compound assignment
@@ -181,25 +181,29 @@ namespace ft
     template < class It1, class It2 >
     bool    operator<(const ft::reverse_iterator<It1> &l, const ft::reverse_iterator<It2> &r)
     {
-        return (l.base() < r.base());
+        //return (l.base() < r.base());
+        return (l.base() > r.base());
     }
 
     template < class It1, class It2 >
     bool    operator<=(const ft::reverse_iterator<It1> &l, const ft::reverse_iterator<It2> &r)
     {
-        return (l.base() <= r.base());
+        //return (l.base() <= r.base());
+        return (l.base() >= r.base());
     }
 
     template < class It1, class It2 >
     bool    operator>(const ft::reverse_iterator<It1> &l, const ft::reverse_iterator<It2> &r)
     {
-        return (l.base() > r.base());
+        //return (l.base() > r.base());
+        return (l.base() < r.base());
     }
 
     template < class It1, class It2 >
     bool    operator>=(const ft::reverse_iterator<It1> &l, const ft::reverse_iterator<It2> &r)
     {
-        return (l.base() >= r.base());
+        //return (l.base() >= r.base());
+        return (l.base() <= r.base());
     }
 
     template < class It >

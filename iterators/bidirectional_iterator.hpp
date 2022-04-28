@@ -6,7 +6,7 @@
 
 namespace ft
 {
-    template < class T, class Compare = std::less<T>, class ValueCompare = Compare>
+    template < class T, bool B, class Compare = std::less<T>, class ValueCompare = Compare >
     class bidirectional_iterator;
 }
 # include "../tools/rb_tree.hpp"
@@ -14,15 +14,17 @@ namespace ft
 
 namespace ft
 {
-    template < class T, class Compare, class ValueCompare >
+    template < class T, bool B, class Compare, class ValueCompare >
     class bidirectional_iterator
     {
         public:
-            typedef T               value_type;
+            //typedef T               value_type;
+            typedef typename ft::conditional<B, const T, T>::type   value_type;
             typedef Compare         compare;
             typedef ValueCompare    value_compare;
-            typedef T*              pointer;
-            typedef T&              reference;
+            typedef value_type*     pointer;
+            typedef value_type&     reference;
+            typedef Node<T>*        node_ptr;
 
             /// Constructors
 
@@ -31,11 +33,11 @@ namespace ft
                 : _cur(NULL), _comp(comp), _val_comp(comp){}
 
             // by Node
-            bidirectional_iterator(Node<value_type> *src, const compare &comp = compare())
+            bidirectional_iterator(node_ptr src, const compare &comp = compare())
                 : _cur(src), _comp(comp), _val_comp(comp){}
 
             // copy
-            bidirectional_iterator(bidirectional_iterator const &src)
+            bidirectional_iterator(bidirectional_iterator<value_type, false, Compare, ValueCompare> const &src)
                 : _cur(src.getNode()), _comp(src.comp()), _val_comp(src.comp()){}
 
             /// Assignation operator
@@ -47,15 +49,19 @@ namespace ft
                 return (*this);
             }
 
-            Node<value_type> *getNode() const{ return (this->_cur);}
+            node_ptr    getNode() const{ return (this->_cur);}
 
             compare comp() const{ return (this->_comp);}
 
             /// Referencing
 
             reference   operator*() const{ return (*(this->_cur->data));}
+
+            //reference   operator+(){ return (*(this->_cur->data));}
             
             pointer operator->() const{ return (this->_cur->data);}
+
+            //pointer operator->() { return (this->_cur->data);}
 
             /// Increment / Decrement
 
@@ -118,7 +124,7 @@ namespace ft
             }
 
         private:
-            Node<value_type>    *_cur;
+            node_ptr            _cur;
             compare             _comp;
             value_compare       _val_comp;
 
