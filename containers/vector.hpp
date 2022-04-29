@@ -375,8 +375,8 @@ namespace ft
             allocator_type  _alloc;
 
             // Relational operators
-            friend bool operator==(const vector<T, Alloc> &l,
-                    const vector<T, Alloc> &r)
+            friend bool operator==(const vector &l,
+                    const vector &r)
             {
                 if (l.size() == r.size())
                 {
@@ -388,32 +388,27 @@ namespace ft
                 return (false);
             }
 
-            friend bool operator!=(const vector<T, Alloc> &l,
-                    const vector<T, Alloc> &r)
+            friend bool operator!=(const vector &l, const vector &r)
             {
                 return (!(l == r));
             }
 
-            friend bool operator<(const vector<T, Alloc> &l,
-                    const vector<T, Alloc> &r)
+            friend bool operator<(const vector &l, const vector &r)
             {
                 return (ft::lexicographical_compare(l.begin(), l.end(), r.begin(), r.end()));
             }
 
-            friend bool operator<=(const vector<T, Alloc> &l,
-                    const vector<T, Alloc> &r)
+            friend bool operator<=(const vector &l, const vector &r)
             {
                 return (!(r < l));
             }
 
-            friend bool operator>(const vector<T, Alloc> &l,
-                    const vector<T, Alloc> &r)
+            friend bool operator>(const vector &l, const vector &r)
             {
                 return (r < l);
             }
 
-            friend bool operator>=(const vector<T, Alloc> &l,
-                    const vector<T, Alloc> &r)
+            friend bool operator>=(const vector &l, const vector &r)
             {
                 return (!(l < r));
             }

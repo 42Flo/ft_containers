@@ -62,14 +62,20 @@ namespace ft
 
             //reference   operator+(){ return (*(this->_cur->data));}
             
-            pointer operator->() const{ return (this->_cur->data);}
+            pointer operator->() const
+            {
+                return (this->_cur->data);
+            }
 
             //pointer operator->() { return (this->_cur->data);}
 
             /// Increment / Decrement
 
-            bidirectional_iterator  &operator++()
+            /*bidirectional_iterator  &operator++()
             {
+                if (this->_cur == NULL)
+                    return (*this);
+
                 bidirectional_iterator  p = this->_cur->parent;
                 bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
 
@@ -88,6 +94,50 @@ namespace ft
                 else
                     this->_cur = NULL;
                 return (*this);
+            }*/
+            bidirectional_iterator  &operator++()
+            {
+                if (this->_cur->right->data != NULL)
+                {
+                    this->_cur = this->_cur->right;
+                    while (this->_cur->left->data != NULL)
+                        this->_cur = this->_cur->left;
+                }
+                else if (this->_cur->parent != NULL
+                        && this->_val_comp(*(this->_cur->data), *(this->_cur->parent->data)))
+                {
+                    Node<T> *tmp = this->_cur->parent;
+                    while (tmp != NULL && this->_val_comp(*(tmp->data), *(this->_cur->data)))
+                    {
+                        tmp = tmp->parent;
+                    }
+                    this->_cur = tmp;
+                }
+                else
+                {
+                    this->_cur = this->_cur->right;
+                }
+                return (*this);
+            }
+
+            bidirectional_iterator  &operator--()
+            {
+                if (this->_cur->left->data != NULL)
+                {
+                    this->_cur = this->_cur->left;
+                    while (this->_cur->right->data != NULL)
+                        this->_cur = this->_cur->right;
+                }
+                else if (this->_cur->parent != NULL)
+                {
+                    Node<T> *tmp = this->_cur->parent;
+                    while (tmp != NULL && this->_val_comp(*(tmp->data), *(this->_cur->data)))
+                        tmp = tmp->parent;
+                    this->_cur = tmp;
+                }
+                else
+                    this->_cur = this->_cur->left;
+                return (*this);
             }
 
             bidirectional_iterator  operator++(int)
@@ -98,12 +148,18 @@ namespace ft
                 return (tmp);
             }
 
-            bidirectional_iterator  &operator--()
+            /*bidirectional_iterator  &operator--()
             {
+                if (this->_cur == NULL)
+                    return (*this);
+
                 bidirectional_iterator  p = this->_cur->parent;
                 bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
 
-                if (this->_cur->left == NULL && p != NULL &&
+                if (this->_cur->left == NULL && this->_cur->right == NULL &&
+                        this->_cur->data == NULL && p != NULL)
+                    this->_cur = this->_cur->parent;
+                else if (this->_cur->left == NULL && p != NULL &&
                         !this->_val_comp(*(*this), *p))
                     this->_cur = this->_cur->parent;
                 else if (this->_cur->left == NULL && p != NULL && gp != NULL &&
@@ -116,8 +172,8 @@ namespace ft
                         this->_cur = this->_cur->right;
                 }
                 return (*this);
-            }
-
+            }*/
+ 
             bidirectional_iterator  operator--(int)
             {
                 bidirectional_iterator  tmp(this->_cur);
