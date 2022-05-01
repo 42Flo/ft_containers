@@ -97,52 +97,53 @@ namespace ft
             }*/
             bidirectional_iterator  &operator++()
             {
-                if (this->_cur->right->data != NULL)
+                if (this->_cur->right != this->_cur->leaf)
                 {
                     this->_cur = this->_cur->right;
-                    while (this->_cur->left->data != NULL)
+                    while (this->_cur->left != this->_cur->leaf)
                         this->_cur = this->_cur->left;
                 }
-                else if (this->_cur->parent != NULL
-                        && this->_val_comp(*(this->_cur->data), *(this->_cur->parent->data)))
+                else 
                 {
                     Node<T> *tmp = this->_cur->parent;
                     while (tmp != NULL && this->_val_comp(*(tmp->data), *(this->_cur->data)))
-                    {
                         tmp = tmp->parent;
-                    }
-                    this->_cur = tmp;
+                    if (tmp == NULL)
+                        this->_cur = this->_cur->leaf;
+                    else
+                        this->_cur = tmp;
                 }
-                else
-                {
-                    this->_cur = this->_cur->right;
-                }
+                    
                 return (*this);
             }
 
             bidirectional_iterator  &operator--()
             {
-                if (this->_cur->left->data != NULL)
+                if (this->_cur == this->_cur->leaf)
+                    this->_cur = this->_cur->parent;
+                else if (this->_cur->left != this->_cur->leaf)
                 {
                     this->_cur = this->_cur->left;
-                    while (this->_cur->right->data != NULL)
+                    while (this->_cur->right != this->_cur->leaf)
                         this->_cur = this->_cur->right;
                 }
-                else if (this->_cur->parent != NULL)
+                else
                 {
                     Node<T> *tmp = this->_cur->parent;
-                    while (tmp != NULL && this->_val_comp(*(tmp->data), *(this->_cur->data)))
+                    while (tmp != NULL && this->_val_comp(*(this->_cur->data), *(tmp->data)))
                         tmp = tmp->parent;
-                    this->_cur = tmp;
+                    if (tmp == NULL)
+                        this->_cur = this->_cur->leaf;
+                    else
+                        this->_cur = tmp;
                 }
-                else
-                    this->_cur = this->_cur->left;
                 return (*this);
             }
 
             bidirectional_iterator  operator++(int)
             {
                 bidirectional_iterator tmp(this->_cur);
+
 
                 ++(*this);
                 return (tmp);

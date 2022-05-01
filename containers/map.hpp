@@ -59,12 +59,12 @@ namespace ft
             // default
             explicit map(const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type())
-                : _tree(), _comp(comp), _size(0), _alloc(alloc)
+                : _tree(comp), _comp(comp), _size(0), _alloc(alloc)
             {
             }
 
             // copy
-            map(const map &x) : _comp(x._comp), _size(0), _alloc(x._alloc)
+            map(const map &x) : _tree(x._comp), _comp(x._comp), _size(0), _alloc(x._alloc)
             {
                 this->insert(x.begin(), x.end());
             }
@@ -74,7 +74,7 @@ namespace ft
             map(InputIterator first, InputIterator last,
                     const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type())
-                : _comp(comp), _size(0), _alloc(alloc)
+                : _tree(comp), _comp(comp), _size(0), _alloc(alloc)
             {
                 this->insert(first, last);
             }
@@ -104,26 +104,31 @@ namespace ft
 
             iterator    begin()
             {
+                if (this->_tree.getLowest() == NULL)
+                    return (iterator(this->_tree.getLeaf()));
                 return (iterator(this->_tree.getLowest()));
             }
 
             const_iterator  begin() const
             {
+                if (this->_tree.getLowest() == NULL)
+                    return (iterator(this->_tree.getLeaf()));
                 return (const_iterator(this->_tree.getLowest()));
             }
 
             iterator    end()
             {
-                if (this->_size == 0)
-                    return (this->begin());
-                return (iterator(this->_tree.getHighest()->right));
+               // if (this->_size == 0)
+                //    return (this->begin());
+                //std::cout << "end: " <<  _tree.getLeaf() << std::endl;
+                return (iterator(this->_tree.getLeaf()));
             }
 
             const_iterator  end() const
             {
-                if (this->_size == 0)
-                    return (this->begin());
-                return (const_iterator(this->_tree.getHighest()->right));
+                //if (this->_size == 0)
+                //    return (this->begin());
+                return (const_iterator(this->_tree.getLeaf()));
             }
 
             reverse_iterator    rbegin()
@@ -173,11 +178,15 @@ namespace ft
             iterator    insert(iterator position, const value_type &val)
             {
                 iterator    it = this->find(val.first);
+                Node<value_type>     *hint = NULL;
 
+                if (position != NULL && position != this->end() &&
+                    this->find(position->first) == --this->lower_bound(val.first))
+                    hint = position.getNode();
                 if (it != this->end())
                     return (it);
                 ++this->_size;
-                return (this->_tree.insert(val, position));
+                return (this->_tree.insert(val, hint));
             }
 
             // insert(): in range
@@ -188,7 +197,7 @@ namespace ft
             {
                 for ( ; first != last ; ++first)
                 {
-                    std::cout << "insert loop!" << std::endl;
+                    //std::cout << "insert loop!" << std::endl;
                     this->insert(*first);
                 }
             }
@@ -207,7 +216,7 @@ namespace ft
             {
                 iterator    it = this->find(k);
 
-                if (it != NULL)
+                if (it != this->end())
                 {
                     this->_tree.deleteNode(it.getNode());
                     --this->_size;
@@ -223,11 +232,33 @@ namespace ft
 
                 while (first != last)
                 {
+                    std::cout << "erase loop" << std::endl;
+                    //std::cout << first->first << std::endl;
+
                     tmp = first;
+                    std::cout << "highest in loop" << this->_tree.getHighest()->data->first << std::endl;
+                    std::cout << "First before inc = " << first.getNode()->data->first << std::endl;
+                    std::cout << "Value to delete = " << tmp.getNode()->data->first << std::endl;
+                   
                     ++first;
-                    this->_tree.deleteNode(tmp.getNode());
-                    --this->_size;
+
+                    //--last;
+                    this->erase(tmp);
+                   // this->_tree.deleteNode(tmp.getNode());   
+                   // --this->_size;
+                    if (first != last)
+                        std::cout << "First after erase = " << (first).getNode()->data->first << std::endl;
+                    else
+                    {
+                        std::cout << "first = last" << std::endl;
+                        break;
+                    }
                 }
+                std::cout << "The size after erase = " << _size << std::endl;
+                /*if (first.getNode() != NULL)
+                {
+                    this->_tree.deleteNode(first.getNode());
+                }*/
             }
 
             void    swap(map &x)
@@ -239,7 +270,7 @@ namespace ft
             }
 
             void    clear()
-            {
+            {/*
                 iterator    it = this->begin();
                 iterator    ite = this->end();
                 iterator    tmp;
@@ -251,6 +282,8 @@ namespace ft
                     this->_tree.deleteNode(tmp.getNode());
                     --this->_size;
                 }
+                */
+                this->erase(this->begin(), this->end());
             }
 
             /// Observers
@@ -267,23 +300,32 @@ namespace ft
 
             iterator        find(const key_type &k)
             {
+                if (this->_size == 0)
+                    return (this->end());
                 iterator    it = this->begin();
 
+                //std::cout << "find called" << std::endl;
                 while (it != this->end())
                 {
-                    std::cout << "find loop!" << std::endl;
-                    std::cout << this->_tree.getHighest()->data->first << std::endl;
-                    std::cout << ( it == this->_tree.getHighest()->right) << std::endl;
+                    //std::cout << "find loop!" << std::endl;
+                    //std::cout << this->_tree.getHighest()->data->first << std::endl;
+                    //std::cout << ( it == this->_tree.getHighest()->right) << std::endl;
                     //std::cout << it->first << std::endl;
                     if (!this->_comp(it->first, k) && !this->_comp(k, it->first))
+                    {
+                        //std::cout << "find comp break" << std::endl;
                         break;
+                    }
                     ++it;
                 }
+                //std::cout << "it = end? " << (it == this->end()) << std::endl;
                 return (it);
             }
 
             const_iterator  find(const key_type &k) const
             {
+                if (this->_size == 0)
+                    return (this->end());
                 const_iterator  it = this->begin();
 
                 while (it != this->end())
@@ -308,6 +350,7 @@ namespace ft
 
                 while (it != this->end() && this->_comp(it->first, k))
                     ++it;
+                //std::cout << "lower bound: " << it->first << std::endl;
                 return (it);
             }
 
@@ -322,13 +365,25 @@ namespace ft
 
             iterator    upper_bound(const key_type &k)
             {
-                return (this->lower_bound(k) == this->end() ? this->end() : ++this->lower_bound(k));
+                iterator    it(this->begin());
+
+                while (it != this->end() && !this->_comp(k, it->first))
+                    ++it;
+                return (it);
+
+                
+                /*iterator    it = this->lower_bound(k);
+
+                return (it != this->end() ? ++it : it);*/
             }
 
             const_iterator  upper_bound(const key_type &k) const
             {
-                return (this->lower_bound(k) == this->end() ? this->end() : ++this->lower_bound(k));
-                //return (++this->lower_bound(k));
+                const_iterator    it(this->begin());
+
+                while (it != this->end() && !this->_comp(k, it->first))
+                    ++it;
+                return (it);
             }
 
             ft::pair<iterator, iterator>    equal_range(const key_type &k)
