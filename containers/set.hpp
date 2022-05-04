@@ -6,6 +6,8 @@
 
 # include "../tools/rb_tree.hpp"
 # include "../tools/tools.hpp"
+# include "../iterators/reverse_iterator.hpp"
+# include "../iterators/bidirectional_iterator.hpp"
 
 namespace ft
 {
@@ -26,11 +28,11 @@ namespace ft
             typedef size_t  size_type;
             typedef ptrdiff_t   difference_type;
 
-            typedef typename
-                RBTree<value_type, key_compare, value_compare, Alloc>::iterator    iterator;
-            typedef typename
-                RBTree<value_type, key_compare, value_compare, Alloc>::const_iterator   const_iterator;
-            typedef typename ft::reverse_iterator<iterator> reverse_iterator;
+
+		    typedef typename ft::bidirectional_iterator<value_type, false, key_compare, value_compare> iterator;
+    		typedef typename ft::bidirectional_iterator<value_type, true, key_compare, value_compare> const_iterator;
+    		typedef ft::reverse_iterator<iterator> reverse_iterator;
+    		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
             /// Constructors
 
@@ -40,7 +42,7 @@ namespace ft
                 : _tree(), _comp(comp), _size(0), _alloc(alloc){}
 
             // copy
-            set(const set &x) : _tree(x._tree), _size(x._size)
+            set(const set &x) : _alloc(x._alloc), _tree(x._tree), _size(x._size)
             {
                 //TODO test copy
             }
@@ -52,8 +54,7 @@ namespace ft
                     const allocator_type &alloc = allocator_type())
                 : _comp(comp), _alloc(alloc), _size(0)
             {
-                while (first != last)
-                    this->insert(*first++);
+                insert(first, last);
             }
 
             /// Destructor
@@ -69,8 +70,11 @@ namespace ft
             {
                 if (this != &x)
                 {
-                    this->_tree = x._tree;
-                    this->_size = x._size;
+                    clear();
+                    _tree = x._tree;
+                    _size = x._size;
+                    _alloc = x._alloc;
+                    _comp = x._comp;
                 }
                 return (*this);
             }

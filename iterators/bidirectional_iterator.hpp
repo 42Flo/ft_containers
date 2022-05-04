@@ -1,207 +1,160 @@
-#ifndef BIDIRECTIONAL_ITERATOR_HPP
-# define BIDIRECTIONAL_ITERATOR_HPP
+//
+// Created by Segal Codin on 23/04/2022.
+//
 
-# include <iostream>
-# include <memory>
+#ifndef _BIDIRECTIONAL_ITERATOR_HPP
+#define _BIDIRECTIONAL_ITERATOR_HPP
 
-namespace ft
-{
-    template < class T, bool B, class Compare = std::less<T>, class ValueCompare = Compare >
-    class bidirectional_iterator;
-}
 # include "../tools/rb_tree.hpp"
-# include "../containers/map.hpp"
+# include "../tools/type_traits.hpp"
 
 namespace ft
 {
-    template < class T, bool B, class Compare, class ValueCompare >
-    class bidirectional_iterator
-    {
-        public:
-            //typedef T               value_type;
-            typedef typename ft::conditional<B, const T, T>::type   value_type;
-            typedef Compare         compare;
-            typedef ValueCompare    value_compare;
-            typedef value_type*     pointer;
-            typedef value_type&     reference;
-            typedef Node<T>*        node_ptr;
+	template < class T, bool B ,class Compare = std::less<T>, class ValueCompare = Compare>
+	class bidirectional_iterator
+	{
+	public:
 
-            /// Constructors
+		typedef typename ft::conditional<B, const T, T > ::type value_type;
+		typedef value_type*				pointer;
+		typedef value_type&				reference;
+		typedef Compare					compare;
+		typedef ValueCompare			value_compare;
+		typedef Node<T>*				nodePtr;
 
-            // default
-            //bidirectional_iterator(const compare &comp = compare())
-            //    : _cur(NULL), _comp(comp), _val_comp(comp){}
+		bidirectional_iterator(const compare &comp = compare()) :
+				_comp(comp),
+				_valComp(comp)
+		{
+			_cur = NULL;
+		}
 
-            // by Node
-            bidirectional_iterator(node_ptr src = 0, const compare &comp = compare())
-                : _cur(src), _comp(comp), _val_comp(comp){}
+		bidirectional_iterator(nodePtr src, const compare &comp = compare()) :
+		_comp(comp),
+		_valComp(comp)
+		{
+			_cur = src;
+		}
 
-            // copy
-            bidirectional_iterator(bidirectional_iterator<T, false, Compare, ValueCompare> const &src)
-                : _cur(src.getNode()), _comp(src.comp()), _val_comp(src.comp()){}
-            
-            //bidirectional_iterator(bidirectional_iterator<value_type, true, Compare, ValueCompare> const &src)
-              //  : _cur(src.getNode()), _comp(src.comp()), _val_comp(src.comp()){}
+		bidirectional_iterator(bidirectional_iterator<T, false, Compare, ValueCompare> const &other) :
+		_comp(other.GetCompare()),
+		_valComp(other.GetCompare())
+		{
+			_cur = other.GetNode();
+		}
 
-            /// Assignation operator
+		nodePtr GetNode() const
+		{
+			return (this->_cur);
+		}
 
-            bidirectional_iterator  &operator=(bidirectional_iterator const &r)
-            {
-                if (this != &r)
-                    this->_cur = r.getNode();
-                return (*this);
-            }
+		compare GetCompare() const
+		{
+			return (this->_comp);
+		}
 
-            node_ptr    getNode() const{ return (this->_cur);}
+		reference operator*() const
+		{
+			return (*(this->_cur->data));
+		}
 
-            compare comp() const{ return (this->_comp);}
-
-            /// Referencing
-
-            reference   operator*() const{ return (*(this->_cur->data));}
-
-            //reference   operator+(){ return (*(this->_cur->data));}
-            
-            pointer operator->() const
-            {
-                return (this->_cur->data);
-            }
-
-            //pointer operator->() { return (this->_cur->data);}
-
-            /// Increment / Decrement
-
-            /*bidirectional_iterator  &operator++()
-            {
-                if (this->_cur == NULL)
-                    return (*this);
-
-                bidirectional_iterator  p = this->_cur->parent;
-                bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
-
-                if (this->_cur->right == NULL && p != NULL &&
-                        this->_val_comp(*(*this), *p))
-                    this->_cur = this->_cur->parent;
-                else if (this->_cur->right == NULL && p != NULL && gp != NULL &&
-                        this->_val_comp(*(*this), *gp))
-                    this->_cur = this->_cur->parent->parent;
-                else if (this->_cur->right != NULL)
-                {
-                    this->_cur = this->_cur->right;
-                    while (this->_cur != NULL && this->_cur->left != NULL)
-                        this->_cur = this->_cur->left;
-                }
-                else
-                    this->_cur = NULL;
-                return (*this);
-            }*/
-            bidirectional_iterator  &operator++()
-            {
-                if (this->_cur->right != this->_cur->leaf)
-                {
-                    this->_cur = this->_cur->right;
-                    while (this->_cur->left != this->_cur->leaf)
-                        this->_cur = this->_cur->left;
-                }
-                else 
-                {
-                    Node<T> *tmp = this->_cur->parent;
-                    while (tmp != NULL && this->_val_comp(*(tmp->data), *(this->_cur->data)))
-                        tmp = tmp->parent;
-                    if (tmp == NULL)
-                        this->_cur = this->_cur->leaf;
-                    else
-                        this->_cur = tmp;
-                }
-                    
-                return (*this);
-            }
-
-            bidirectional_iterator  &operator--()
-            {
-                if (this->_cur == this->_cur->leaf)
-                    this->_cur = this->_cur->parent;
-                else if (this->_cur->left != this->_cur->leaf)
-                {
-                    this->_cur = this->_cur->left;
-                    while (this->_cur->right != this->_cur->leaf)
-                        this->_cur = this->_cur->right;
-                }
-                else
-                {
-                    Node<T> *tmp = this->_cur->parent;
-                    while (tmp != NULL && this->_val_comp(*(this->_cur->data), *(tmp->data)))
-                        tmp = tmp->parent;
-                    if (tmp == NULL)
-                        this->_cur = this->_cur->leaf;
-                    else
-                        this->_cur = tmp;
-                }
-                return (*this);
-            }
-
-            bidirectional_iterator  operator++(int)
-            {
-                bidirectional_iterator tmp(this->_cur);
+		pointer operator->() const
+		{
+			return (this->_cur->data);
+		}
 
 
-                ++(*this);
-                return (tmp);
-            }
+		bidirectional_iterator &operator=(bidirectional_iterator const &rhs)
+		{
+			if (this != &rhs)
+				this->_cur = rhs.GetNode();
+			return (*this);
+		}
 
-            /*bidirectional_iterator  &operator--()
-            {
-                if (this->_cur == NULL)
-                    return (*this);
+		bidirectional_iterator  &operator++()
+		{
+			if (this->_cur->right != this->_cur->leaf)
+			{
+				this->_cur = this->_cur->right;
+				while (this->_cur->left != this->_cur->leaf)
+					this->_cur = this->_cur->left;
+			}
+			else
+			{
+				Node<T> *tmp = this->_cur->parent;
+				while (tmp != NULL && this->_valComp(*(tmp->data), *(this->_cur->data)))
+					tmp = tmp->parent;
+				if (tmp == NULL)
+					this->_cur = this->_cur->leaf;
+				else
+					this->_cur = tmp;
+			}
 
-                bidirectional_iterator  p = this->_cur->parent;
-                bidirectional_iterator  gp = (p != NULL) ? this->_cur->parent->parent : NULL;
+			return (*this);
+		}
 
-                if (this->_cur->left == NULL && this->_cur->right == NULL &&
-                        this->_cur->data == NULL && p != NULL)
-                    this->_cur = this->_cur->parent;
-                else if (this->_cur->left == NULL && p != NULL &&
-                        !this->_val_comp(*(*this), *p))
-                    this->_cur = this->_cur->parent;
-                else if (this->_cur->left == NULL && p != NULL && gp != NULL &&
-                        !this->_val_comp(*(*this), *gp))
-                    this->_cur = this->_cur->parent->parent;
-                else if (this->_cur->left != NULL)
-                {
-                    this->_cur = this->_cur->left;
-                    while (this->_cur != NULL && this->_cur->right != NULL)
-                        this->_cur = this->_cur->right;
-                }
-                return (*this);
-            }*/
- 
-            bidirectional_iterator  operator--(int)
-            {
-                bidirectional_iterator  tmp(this->_cur);
+		bidirectional_iterator  &operator--()
+		{
+			if (this->_cur == this->_cur->leaf)
+				this->_cur = this->_cur->parent;
+			else if (this->_cur->left != this->_cur->leaf)
+			{
+				this->_cur = this->_cur->left;
+				while (this->_cur->right != this->_cur->leaf)
+					this->_cur = this->_cur->right;
+			}
+			else
+			{
+				Node<T> *tmp = this->_cur->parent;
+				while (tmp != NULL && this->_valComp(*(this->_cur->data), *(tmp->data)))
+					tmp = tmp->parent;
+				if (tmp == NULL)
+					this->_cur = this->_cur->leaf;
+				else
+					this->_cur = tmp;
+			}
+			return (*this);
+		}
 
-                --(*this);
-                return (tmp);
-            }
+		bidirectional_iterator  operator++(int)
+		{
+			bidirectional_iterator tmp(this->_cur);
+			++(*this);
+			return (tmp);
+		}
 
-        private:
-            node_ptr            _cur;
-            compare             _comp;
-            value_compare       _val_comp;
+		bidirectional_iterator  operator--(int)
+		{
+			bidirectional_iterator  tmp(this->_cur);
 
-            /// Relational operators
+			--(*this);
+			return (tmp);
+		}
+#pragma endregion Operator
 
-            friend bool operator==(const bidirectional_iterator &l,
-                    const bidirectional_iterator &r)
-            {
-                return (l.getNode() == r.getNode());
-            }
+	private:
+		nodePtr				_cur;
+		compare 			_comp;
+		value_compare		_valComp;
 
-            friend bool operator!=(const bidirectional_iterator &l,
-                    const bidirectional_iterator &r)
-            {
-                return (!(l == r));
-            }
-    };
+		friend bool operator==(const bidirectional_iterator &lhs,
+				const bidirectional_iterator &rhs)
+		{
+			//return (lhs.GetNode() == rhs.GetNode());
+            if (lhs.operator->() == rhs.operator->())
+                return (true);
+            if (lhs.operator->() == NULL || rhs.operator->() == NULL)
+                return (false);
+            return (!lhs._valComp(*lhs, *rhs) && !rhs._valComp(*rhs, *lhs));
+//            return (*lhs == *rhs);
+		}
+
+		friend bool operator!=(const bidirectional_iterator &lhs,
+				const bidirectional_iterator &rhs)
+		{
+			return (!(lhs == rhs));
+		}
+	};
 }
 
-#endif // BIDIRECTIONAL_ITERATOR_HPP
+#endif //_BIDIRECTIONAL_ITERATOR_HPP
