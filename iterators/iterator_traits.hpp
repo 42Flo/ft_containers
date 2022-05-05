@@ -6,17 +6,18 @@
 
 namespace ft
 {
+    // traits for iterator
 	template < class Iterator >
 	struct iterator_traits
 	{
-		public:
-			typedef typename Iterator::difference_type	    difference_type;
-			typedef typename Iterator::value_type	        value_type;
-			typedef typename Iterator::pointer	            pointer;
-			typedef typename Iterator::reference	        reference;
-			typedef typename Iterator::iterator_category    iterator_category;
-	};
+        typedef typename Iterator::difference_type	    difference_type;
+        typedef typename Iterator::value_type	        value_type;
+        typedef typename Iterator::pointer	            pointer;
+        typedef typename Iterator::reference	        reference;
+        typedef typename Iterator::iterator_category    iterator_category;
+    };
 
+    // traits for T = value_type
     template < class T >
     struct iterator_traits<T*>
     {
@@ -27,6 +28,7 @@ namespace ft
         typedef T&              reference;
     };
 
+    // traits for T = const value_type
     template < class T>
     struct iterator_traits<const T*>
     {

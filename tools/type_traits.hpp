@@ -78,4 +78,4 @@ namespace ft
     struct conditional<false, T, F> { typedef F type;};
 }
 
-#endif // UTILS_HPP
+#endif // TYPE_TRAITS_HPP

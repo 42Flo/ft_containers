@@ -7,12 +7,10 @@ ULINE="\e[4m"
 RESET="\e[0m"
 
 CC="c++"
-FLAGS="-Wall -Wextra -g -fsanitize=address"
+FLAGS="-Wall -Wextra -Werror -std=c++98"
 
 containers=(vector stack map set)
 path_containers="../containers"
-path_tools="../tools"
-path_it="../iterators"
 
 path_bin="bin"
 path_output="output"
@@ -66,7 +64,7 @@ getTimeDiff()
     if [ $1 -gt $2 ]; then # ft slower than std
         time_diff=$(echo $1/$2 | bc -l)
     else # ft faster than std
-        time_diff=$(echo -1*$2/$1 | bc -l)
+        time_diff=$(echo $2/$1*-1 | bc -l)
     fi
 }
 
@@ -75,7 +73,7 @@ executeTest()
 {
     name="$1_${2%.*}"
     pname="${2%.*}"
-    include="-I$path_containers -I$path_tools -I$path_it"
+    include="-I$path_containers"
 
     $CC $FLAGS -o $path_bin/ft_$name $include $1/$2 2> $path_errors/ft_$name.txt
     [ -s $path_errors/ft_$name.txt ] || rm $path_errors/ft_$name.txt # delete error file if empty

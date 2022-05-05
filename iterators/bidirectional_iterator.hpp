@@ -1,7 +1,7 @@
 #ifndef BIDIRECTIONAL_ITERATOR_HPP
 # define BIDIRECTIONAL_ITERATOR_HPP
 
-# include "../tools/rb_tree.hpp"
+# include "../red_black_tree/rb_tree.hpp"
 # include "../tools/type_traits.hpp"
 
 namespace ft
@@ -11,7 +11,7 @@ namespace ft
     {
         public:
             typedef bidirectional_iterator  iterator_category;
-            typedef typename ft::conditional<B, const T, T > ::type value_type;
+            typedef typename ft::conditional<B, const T, T >::type value_type;
             typedef value_type*	    pointer;
             typedef value_type&		reference;
             typedef Compare			compare;

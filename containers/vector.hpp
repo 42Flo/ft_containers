@@ -43,7 +43,6 @@ namespace ft
 			vector(const vector &x)
 				: _vector(NULL), _size(0), _capacity(0), _alloc(x.get_allocator())
 			{
-                //insert(begin(), x.begin(), x.end());//TODO check
                 assign(x.begin(), x.end());
 			}
 
@@ -156,7 +155,7 @@ namespace ft
 
 			size_type	size() const{ return (_size);}
 
-			size_type	max_size() const { return (_alloc.max_size());}
+			size_type	max_size() const{ return (_alloc.max_size());}
 
 			void	resize(size_type n, value_type val = value_type())
 			{
@@ -173,9 +172,9 @@ namespace ft
                 _size = n;
 			}
 
-			size_type	capacity() const { return (_capacity);}
+			size_type	capacity() const{ return (_capacity);}
 			
-			bool    empty() const { return (_size == 0);}
+			bool    empty() const{ return (_size == 0);}
 
             void    reserve(size_type n)
             {
@@ -276,10 +275,11 @@ namespace ft
             iterator	erase(iterator position)
             {
                 _alloc.destroy(&(*position));
-                _shiftLeft(position - begin(), 1);//TODO check with iterator NULL
+                _shiftLeft(position - begin(), 1);
                 --_size;
                 return (position);
             }
+
             // in range
             iterator	erase(iterator first, iterator last)
             {
@@ -312,6 +312,10 @@ namespace ft
             }
 
         private:
+            pointer _vector;
+            size_type	_size;
+            size_type	_capacity;
+            allocator_type  _alloc;
 
             void    _shiftRight(difference_type pos, size_type n)
             {
@@ -341,12 +345,6 @@ namespace ft
                     }
                 }
             }
-
-        private:
-            pointer _vector;
-            size_type	_size;
-            size_type	_capacity;
-            allocator_type  _alloc;
 
             /// Relational operators
 

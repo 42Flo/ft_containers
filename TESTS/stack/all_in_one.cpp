@@ -23,7 +23,7 @@ int main()
 {
     NS_TARGET::stack<TYPE>  st;
     NS_TARGET::stack<int>   intSt;
-    NS_TARGET::stack<int, std::list<int>>   intSt2;
+    NS_TARGET::stack<int, std::list<int> >   intSt2;
 
     printSize(st);
     std::cout << st.empty() << std::endl;

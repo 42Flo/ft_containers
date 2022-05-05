@@ -6,12 +6,12 @@ int main()
     unsigned int        size = vec.size();
     int value = 1;
 
-    // Assigning values using operator[]
+    // assigning values using operator[]
     for (unsigned int i = 0 ; i < size ; ++i)
         vec[i] = value++;
     printVector(vec);
 
-    // Reverse values
+    // reverse values
     for (unsigned int i = 0 ; i < size / 2 ; ++i)
     {
         int tmp = vec[size - i - 1];

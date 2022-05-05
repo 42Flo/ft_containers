@@ -16,12 +16,12 @@ namespace ft
 		typedef T*			pointer;
 		typedef Node<T>*	node_pointer;
 
-		pointer data;
-		bool    color;
+		pointer         data;
 		node_pointer    parent;
 		node_pointer	left;
 		node_pointer	right;
 		node_pointer 	leaf;
+		bool            color;
 
 		node_pointer	getUncle() const
 		{

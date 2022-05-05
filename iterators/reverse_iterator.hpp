@@ -1,9 +1,5 @@
-//
-// Created by Segal Codin on 17/03/2022.
-//
-
-#ifndef _VECTOR_REVERSE_ITERATOR_HPP
-#define _VECTOR_REVERSE_ITERATOR_HPP
+#ifndef REVERSE_ITERATOR_HPP
+# define REVERSE_ITERATOR_HPP
 
 #include <memory>
 # include "iterator_traits.hpp"
@@ -177,4 +173,4 @@ bool operator>=(ft::reverse_iterator<Iter1> const &lhs, ft::reverse_iterator<Ite
     return (lhs.base() <= rhs.base());
 }
 
-#endif //_VECTOR_REVERSE_ITERATOR_HPP
+#endif // REVERSE_ITERATOR_HPP

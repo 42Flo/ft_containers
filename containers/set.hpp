@@ -4,7 +4,7 @@
 # include <iostream>
 # include <memory>
 
-# include "../tools/rb_tree.hpp"
+# include "../red_black_tree/rb_tree.hpp"
 # include "../tools/tools.hpp"
 # include "../iterators/reverse_iterator.hpp"
 # include "../iterators/bidirectional_iterator.hpp"
@@ -26,7 +26,7 @@ namespace ft
             typedef typename allocator_type::pointer    pointer;
             typedef typename allocator_type::const_pointer  const_pointer;
             typedef size_t  size_type;
-            //typedef ptrdiff_t   difference_type;
+            typedef ptrdiff_t   difference_type;
 
 
 		    typedef typename ft::bidirectional_iterator<value_type, true, key_compare, value_compare>  iterator;
@@ -161,9 +161,7 @@ namespace ft
             // single element by value
             size_type   erase(const value_type &val)
             {
-                //value_type tmp = ft::make_pair(key, mapped_type());
-
-                if (_tree.deleteByData(val) == true)
+                if (_tree.erase(val) == true)
                 {
                     --_size;
                     return (1);
@@ -216,7 +214,6 @@ namespace ft
 
             iterator    find(const value_type &val)
             {
-                //value_type toFind = ft::make_pair(key, mapped_type());
                 Node<value_type> *found = _tree.searchByData(val);
 
                 if (*(found->data) != val)
@@ -226,7 +223,6 @@ namespace ft
 
             const_iterator    find(const value_type &val) const
             {
-                //value_type toFind = ft::make_pair(key, mapped_type());
                 Node<value_type> *found = _tree.searchByData(val);
 
                 if (*(found->data) != val)

@@ -6,7 +6,7 @@
 
 
 # include "../tools/type_traits.hpp"
-# include "../tools/rb_tree.hpp"
+# include "../red_black_tree/rb_tree.hpp"
 # include "../tools/tools.hpp"
 # include "../iterators/reverse_iterator.hpp"
 # include "../iterators/bidirectional_iterator.hpp"
@@ -105,6 +105,7 @@ namespace ft
 
             /// Element access
 
+/*          // c++11
             T &at(const Key &key)
             {
                 iterator tmp = find(key);
@@ -122,6 +123,7 @@ namespace ft
                     throw (std::out_of_range("Key not found"));
                 return (tmp->second);
             }
+*/
 
             T &operator[](const Key &key)
             {
@@ -189,8 +191,17 @@ namespace ft
             // with hint
             iterator insert(iterator hint, const value_type &val)
             {
-                (void)hint;
-                ///TODO hint to be added somewhere
+                if (hint != begin() && hint != end())
+                {
+                    if (hint == --lower_bound(val.first))
+                    {
+                        ft::pair<iterator, bool> ret = _tree.insert(val, hint.getNode());
+                        if (ret.second == true)
+                            ++_size;
+                        else
+                            return (end());
+                    }
+                }
                 return (insert(val).first);
             }
 
@@ -216,7 +227,7 @@ namespace ft
             {
                 value_type tmp = ft::make_pair(key, mapped_type());
 
-                if (_tree.deleteByData(tmp) == true)
+                if (_tree.erase(tmp) == true)
                 {
                     --_size;
                     return (1);
