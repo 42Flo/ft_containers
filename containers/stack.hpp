@@ -13,9 +13,10 @@ namespace ft
             typedef Container   container_type;
             typedef size_t  size_type;
 
-            // Default constructor
             explicit stack(const container_type &ctnr = container_type())
                 : _ctnr(ctnr){}
+
+            ~stack(){ ~_ctnr;}
 
             bool    empty() const{ return (this->_ctnr.empty());}
 
@@ -36,26 +37,31 @@ namespace ft
             {
                 return (l._ctnr == r._ctnr);
             }
+
             friend bool operator!=(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
                 return (l._ctnr != r._ctnr);
             }
+
             friend bool operator<(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
                 return (l._ctnr < r._ctnr);
             }
+
             friend bool operator<=(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
                 return (l._ctnr <= r._ctnr);
             }
+
             friend bool operator>(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
                 return (l._ctnr > r._ctnr);
             }
+
             friend bool operator>=(const stack<T, Container> &l,
                     const stack<T, Container> &r)
             {
