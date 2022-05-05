@@ -16,7 +16,7 @@ namespace ft
             explicit stack(const container_type &ctnr = container_type())
                 : _ctnr(ctnr){}
 
-            ~stack(){ ~_ctnr;}
+            ~stack(){}
 
             bool    empty() const{ return (this->_ctnr.empty());}
 

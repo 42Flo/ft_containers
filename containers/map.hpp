@@ -68,11 +68,8 @@ namespace ft
                 : _alloc(alloc), _tree(), _size(0), _comp(comp){}
 
             // copy
-            map(const map &other)
-                : _alloc(other._alloc), _tree(other._tree), _comp(other._comp)
-            {
-                _size = other._size;
-            }
+            map(const map &x) : _alloc(x._alloc), _tree(x._tree),
+                _size(x._size),_comp(x._comp){}
 
             // in range
             template<class InputIterator>
@@ -93,15 +90,15 @@ namespace ft
 
             /// Assignation
 
-            map &operator=(const map &other)
+            map &operator=(const map &x)
             {
-                if (this != &other)
+                if (this != &x)
                 {
                     clear();
-                    _tree = other._tree;
-                    _size = other._size;
-                    _alloc = other._alloc;
-                    _comp = other._comp;
+                    _tree = x._tree;
+                    _size = x._size;
+                    _alloc = x._alloc;
+                    _comp = x._comp;
                 }
                 return (*this);
             }
@@ -141,22 +138,22 @@ namespace ft
 
             /// Iterators
 
-            iterator begin(){ return (_tree.getLowest());}
+            iterator    begin(){ return (_tree.getLowest());}
 
-            const_iterator begin() const{ return (_tree.getLowest());}
+            const_iterator  begin() const{ return (_tree.getLowest());}
 
-            reverse_iterator rbegin(){ return (reverse_iterator(end()));}
+            reverse_iterator    rbegin(){ return (reverse_iterator(end()));}
 
             const_reverse_iterator  rbegin() const
             {
                 return (const_reverse_iterator(end()));
             }
 
-            iterator end(){ return (_tree.getLeaf());}
+            iterator    end(){ return (_tree.getLeaf());}
 
-            const_iterator end() const{ return (_tree.getLeaf());}
+            const_iterator  end() const{ return (_tree.getLeaf());}
 
-            reverse_iterator rend(){ return (reverse_iterator(begin()));}
+            reverse_iterator    rend(){ return (reverse_iterator(begin()));}
 
             const_reverse_iterator  rend() const
             {
@@ -182,19 +179,19 @@ namespace ft
             // single element
             ft::pair<iterator, bool> insert(const value_type &value)
             {
-                ft::pair<iterator, bool> retVal = _tree.insert(value);
+                ft::pair<iterator, bool> ret = _tree.insert(value);
 
-                if (retVal.second == true)
+                if (ret.second == true)
                     ++_size;
-                return (retVal);
+                return (ret);
             }
 
             // with hint
-            iterator insert(iterator hint, const value_type &value)
+            iterator insert(iterator hint, const value_type &val)
             {
                 (void)hint;
                 ///TODO hint to be added somewhere
-                return (insert(value).first);
+                return (insert(val).first);
             }
 
             // in range
@@ -209,9 +206,9 @@ namespace ft
             }
 
             // single element by iterator
-            void erase(iterator pos)
+            void erase(iterator position)
             {
-                erase(pos->first);
+                erase(position->first);
             }
 
             // single element by key
@@ -230,29 +227,28 @@ namespace ft
             // in range
             void erase(iterator first, iterator last)
             {
-                int i = 0;
-                int j = 0;
-                Key tmp[_size];
+                key_type arr[_size];
+                int i = 0, j = 0;
 
                 while (first != last)
                 {
-                    tmp[i] = first->first;
+                    arr[i] = first->first;
                     ++first;
                     i++;
                 }
                 while (j < i)
                 {
-                    erase(tmp[j]);
+                    erase(arr[j]);
                     j++;
                 }
             }
 
-            void swap(map &other)
+            void swap(map &x)
             {
-                _tree.swap(other._tree);
-                ft::swap(this->_alloc, other._alloc);
-                ft::swap(this->_size, other._size);
-                ft::swap(this->_comp, other._comp);
+                _tree.swap(x._tree);
+                ft::swap(_alloc, x._alloc);
+                ft::swap(_size, x._size);
+                ft::swap(_comp, x._comp);
             }
 
             /// Lookup
@@ -271,7 +267,7 @@ namespace ft
 
                 if (found->data->first != key)
                     return (end());
-                return (iterator(found));
+                return (found);
             }
 
             const_iterator find(const Key &key) const
@@ -281,7 +277,7 @@ namespace ft
 
                 if (found->data->first != key)
                     return (end());
-                return (const_iterator(found));
+                return (found);
             }
 
             ft::pair<iterator, iterator> equal_range(const Key &key)
@@ -349,7 +345,7 @@ namespace ft
                 if (l.size() == r.size())
                 {
                     const_iterator itr = r.begin();
-                    for (const_iterator it = l.begin(); it != l.end(); ++it)
+                    for (const_iterator it = l.begin() ; it != l.end() ; ++it)
                     {
                         if (it != itr)
                             return (false);

@@ -1,160 +1,142 @@
-//
-// Created by Segal Codin on 23/04/2022.
-//
-
-#ifndef _BIDIRECTIONAL_ITERATOR_HPP
-#define _BIDIRECTIONAL_ITERATOR_HPP
+#ifndef BIDIRECTIONAL_ITERATOR_HPP
+# define BIDIRECTIONAL_ITERATOR_HPP
 
 # include "../tools/rb_tree.hpp"
 # include "../tools/type_traits.hpp"
 
 namespace ft
 {
-	template < class T, bool B ,class Compare = std::less<T>, class ValueCompare = Compare>
-	class bidirectional_iterator
-	{
-	public:
+    template < class T, bool B, class Compare = std::less<T>, class ValueCompare = Compare >
+    class bidirectional_iterator
+    {
+        public:
+            typedef bidirectional_iterator  iterator_category;
+            typedef typename ft::conditional<B, const T, T > ::type value_type;
+            typedef value_type*	    pointer;
+            typedef value_type&		reference;
+            typedef Compare			compare;
+            typedef ValueCompare	value_compare;
+            typedef Node<T>*		node_pointer;
+            typedef std::ptrdiff_t  difference_type;
 
-		typedef typename ft::conditional<B, const T, T > ::type value_type;
-		typedef value_type*				pointer;
-		typedef value_type&				reference;
-		typedef Compare					compare;
-		typedef ValueCompare			value_compare;
-		typedef Node<T>*				nodePtr;
+            /// Constructors
 
-		bidirectional_iterator(const compare &comp = compare()) :
-				_comp(comp),
-				_valComp(comp)
-		{
-			_cur = NULL;
-		}
+            bidirectional_iterator(const compare &comp = compare())
+                : _cur(NULL), _comp(comp), _valComp(comp){}
 
-		bidirectional_iterator(nodePtr src, const compare &comp = compare()) :
-		_comp(comp),
-		_valComp(comp)
-		{
-			_cur = src;
-		}
+            bidirectional_iterator(node_pointer src, const compare &comp = compare())
+                : _cur(src), _comp(comp), _valComp(comp){}
 
-		bidirectional_iterator(bidirectional_iterator<T, false, Compare, ValueCompare> const &other) :
-		_comp(other.GetCompare()),
-		_valComp(other.GetCompare())
-		{
-			_cur = other.GetNode();
-		}
+            bidirectional_iterator(bidirectional_iterator<T, false, Compare, ValueCompare> const &x)
+                : _cur(x.getNode()), _comp(x.getComp()), _valComp(x.getComp()){}
 
-		nodePtr GetNode() const
-		{
-			return (this->_cur);
-		}
+            bidirectional_iterator  &operator=(bidirectional_iterator const &rhs)
+            {
+                if (this != &rhs)
+                    _cur = rhs.getNode();
+                return (*this);
+            }
 
-		compare GetCompare() const
-		{
-			return (this->_comp);
-		}
+            ~bidirectional_iterator(){}
 
-		reference operator*() const
-		{
-			return (*(this->_cur->data));
-		}
+            /// Getters
 
-		pointer operator->() const
-		{
-			return (this->_cur->data);
-		}
+            node_pointer    getNode() const{ return (_cur);}
 
+            compare     getComp() const{ return (_comp);}
 
-		bidirectional_iterator &operator=(bidirectional_iterator const &rhs)
-		{
-			if (this != &rhs)
-				this->_cur = rhs.GetNode();
-			return (*this);
-		}
+            /// Referencing
 
-		bidirectional_iterator  &operator++()
-		{
-			if (this->_cur->right != this->_cur->leaf)
-			{
-				this->_cur = this->_cur->right;
-				while (this->_cur->left != this->_cur->leaf)
-					this->_cur = this->_cur->left;
-			}
-			else
-			{
-				Node<T> *tmp = this->_cur->parent;
-				while (tmp != NULL && this->_valComp(*(tmp->data), *(this->_cur->data)))
-					tmp = tmp->parent;
-				if (tmp == NULL)
-					this->_cur = this->_cur->leaf;
-				else
-					this->_cur = tmp;
-			}
+            reference   operator*() const{ return (*(_cur->data));}
 
-			return (*this);
-		}
+            pointer     operator->() const{ return (_cur->data);}
 
-		bidirectional_iterator  &operator--()
-		{
-			if (this->_cur == this->_cur->leaf)
-				this->_cur = this->_cur->parent;
-			else if (this->_cur->left != this->_cur->leaf)
-			{
-				this->_cur = this->_cur->left;
-				while (this->_cur->right != this->_cur->leaf)
-					this->_cur = this->_cur->right;
-			}
-			else
-			{
-				Node<T> *tmp = this->_cur->parent;
-				while (tmp != NULL && this->_valComp(*(this->_cur->data), *(tmp->data)))
-					tmp = tmp->parent;
-				if (tmp == NULL)
-					this->_cur = this->_cur->leaf;
-				else
-					this->_cur = tmp;
-			}
-			return (*this);
-		}
+            /// Incrementation
 
-		bidirectional_iterator  operator++(int)
-		{
-			bidirectional_iterator tmp(this->_cur);
-			++(*this);
-			return (tmp);
-		}
+            bidirectional_iterator  &operator++()
+            {
+                if (_cur->right != _cur->leaf)
+                {
+                    _cur = _cur->right;
+                    while (_cur->left != _cur->leaf)
+                        _cur = _cur->left;
+                }
+                else
+                {
+                    Node<T> *tmp = _cur->parent;
+                    while (tmp != NULL && _valComp(*(tmp->data), *(_cur->data)))
+                        tmp = tmp->parent;
+                    if (tmp == NULL)
+                        _cur = _cur->leaf;
+                    else
+                        _cur = tmp;
+                }
 
-		bidirectional_iterator  operator--(int)
-		{
-			bidirectional_iterator  tmp(this->_cur);
+                return (*this);
+            }
 
-			--(*this);
-			return (tmp);
-		}
-#pragma endregion Operator
+            bidirectional_iterator  &operator--()
+            {
+                if (_cur == _cur->leaf)
+                    _cur = _cur->parent;
+                else if (_cur->left != _cur->leaf)
+                {
+                    _cur = _cur->left;
+                    while (_cur->right != _cur->leaf)
+                        _cur = _cur->right;
+                }
+                else
+                {
+                    Node<T> *tmp = _cur->parent;
+                    while (tmp != NULL && _valComp(*(_cur->data), *(tmp->data)))
+                        tmp = tmp->parent;
+                    if (tmp == NULL)
+                        _cur = _cur->leaf;
+                    else
+                        _cur = tmp;
+                }
+                return (*this);
+            }
 
-	private:
-		nodePtr				_cur;
-		compare 			_comp;
-		value_compare		_valComp;
+            bidirectional_iterator  operator++(int)
+            {
+                bidirectional_iterator tmp(_cur);
 
-		friend bool operator==(const bidirectional_iterator &lhs,
-				const bidirectional_iterator &rhs)
-		{
-			//return (lhs.GetNode() == rhs.GetNode());
-            if (lhs.operator->() == rhs.operator->())
-                return (true);
-            if (lhs.operator->() == NULL || rhs.operator->() == NULL)
-                return (false);
-            return (!lhs._valComp(*lhs, *rhs) && !rhs._valComp(*rhs, *lhs));
-//            return (*lhs == *rhs);
-		}
+                ++(*this);
+                return (tmp);
+            }
 
-		friend bool operator!=(const bidirectional_iterator &lhs,
-				const bidirectional_iterator &rhs)
-		{
-			return (!(lhs == rhs));
-		}
-	};
+            bidirectional_iterator  operator--(int)
+            {
+                bidirectional_iterator  tmp(_cur);
+
+                --(*this);
+                return (tmp);
+            }
+
+        private:
+            node_pointer		_cur;
+            compare 			_comp;
+            value_compare		_valComp;
+
+            /// Relational operators
+
+            friend bool operator==(const bidirectional_iterator &lhs,
+                    const bidirectional_iterator &rhs)
+            {
+                if (lhs.operator->() == rhs.operator->())
+                    return (true);
+                if (lhs.operator->() == NULL || rhs.operator->() == NULL)
+                    return (false);
+                return (!lhs._valComp(*lhs, *rhs) && !rhs._valComp(*rhs, *lhs));
+            }
+
+            friend bool operator!=(const bidirectional_iterator &lhs,
+                    const bidirectional_iterator &rhs)
+            {
+                return (!(lhs == rhs));
+            }
+    };
 }
 
-#endif //_BIDIRECTIONAL_ITERATOR_HPP
+#endif // BIDIRECTIONAL_ITERATOR_HPP
