@@ -1,6 +1,6 @@
 # ft_containers - School 42
 
-Re-implementation of several containers from the C++ Standard Template Library (STL).
+Reimplementation of several containers from the C++ Standard Template Library (STL).
 
 - **Vector** - Dynamic array supporting fast random access.
 - **Stack** - LIFO data structure built on top of `vector`.
